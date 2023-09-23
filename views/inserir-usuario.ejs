@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <title>Inserir Nova Vaga</title>
+</head>
+
+<header>
+    <div class="bloco-acess" id="fonte">
+        <p>
+            <span class="a-minus">A-</span> | <span class="a-plus">A+</span>
+        </p>
+    </div>
+    <div class="bloco-acess" id="alto-contraste">
+        <img src="/img/contraste.png" alt="Simbolo de contraste" class="simb-contraste" srcset="" />
+        <p>Alto Contraste</p>
+    </div>
+</header>
+
+<body>
+    <section class="header-principal">
+        <div class="block-header">
+            <div id="menu">
+                <div id="menu-bar" onclick="menuOnClick()">
+                    <div id="bar1" class="bar"></div>
+                    <div id="bar2" class="bar"></div>
+                    <div id="bar3" class="bar"></div>
+                </div>
+                <nav class="nav" id="nav">
+                    <ul>
+                        <li><a href="#">Meu Perfil</a></li>
+                        <li><a href="#">Processos</a></li>
+                        <li><a href="/todas-vagas">Vagas</a></li>
+                        <li><a href="/">Sair</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="menu-bg" id="menu-bg"></div>
+
+        </div>
+
+        <div class="block-header-logo">
+            <img src="/img/logo-everymind.png" alt="Logo Everymind" class="logo" />
+        </div>
+
+    </section>
+    <h1 class="vagas-inserir">Inserir Novo Usuario</h1>
+    <form action="/inserir-usuario" method="post" class="form-vaga">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required class="input-vagas">
+        <br>
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" required class="input-vagas">
+        <br>
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" required class="input-vagas">
+        <br>
+        <label for="raca">Raça:</label>
+        <input type="text" id="raca" name="raca" required class="input-vagas">
+        <br>
+        <label for="genero">Genero:</label>
+        <input type="text" id="genero" name="genero" required class="input-vagas">
+        <br>
+        <label for="pcd">Possui alguma deficiência? Se sim, qual ?</label>
+        <!-- <input type="text" id="vulnerabilidade" name="vulnerabilidade" required class="input-vagas"> -->
+        <select id="pcd" name="pcd" required class="input-vagas">
+            <option value="Não">Não</option>
+            <option value="Sim">Sim</option>
+        </select>
+        <br>
+        <input type="text" id="vulnerabilidade" name="vulnerabilidade" class="input-vulnerabilidade" style="display:none;">
+        <div class="btnSearch">
+            <button class="botaoSearch">
+                <input type="submit" value="Inserir" class="inserir-vaga">
+            </button>
+        </div>
+    </form>
+    <script src="/js/script.js"></script>
+</body>
+
+<footer>
+    <div class="logo-footer">
+        <img src="../img/logo-everymind.png" alt="Logo EY">
+    </div>
+    <div class="social-media">
+
+        <img src="../img/5279111_network_fb_social media_facebook_facebook logo_icon 1.svg" alt="Logo facebook">
+
+
+        <img src="../img/2559760_media_social_video_youtube_icon 1.svg" alt="Logo Youtube">
+
+        <img src="../img/8666638_instagram_icon 1.svg" alt="Logo Instagram">
+
+    </div>
+</footer>
+
+</html>

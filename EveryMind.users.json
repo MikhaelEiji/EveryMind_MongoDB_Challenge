@@ -1,0 +1,44 @@
+[{
+  "_id": {
+    "$oid": "650a550da9a2d4128a111f6c"
+  },
+  "username": "User1",
+  "email": "123",
+  "senha": "$2b$10$KhuhI4shaKasW.hxfaxQOOpNRhZ3VWn3iTqqbhA59IloXXYQ3u.ZW",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "650acc4917031e36037f569c"
+  },
+  "username": "Gui",
+  "email": "gui@",
+  "senha": "$2b$10$MXZpwow71qr9lvXDR21J9.yEzm1jSJZktzq8SySav2i1VdLjePNOC",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "650f3bae0e81fb2ba8f84fe5"
+  },
+  "username": "Joao",
+  "email": "joao@em.com",
+  "senha": "$2b$10$4zWoaosuU2e5sz01S0tUjumk8XT5qRRHXZ6dbKkNSWgajgkvxt8Ua",
+  "raca": "Judeu afrodescendente",
+  "genero": "Indefinido",
+  "pcd": "Sim",
+  "vulnerabilidade": "Gigantismo",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "650f3c160e81fb2ba8f84fe7"
+  },
+  "username": "Caio",
+  "email": "caio@em.com",
+  "senha": "$2b$10$FJD.VqIVRrPUftgNjcfN0uQop9cRKgcfNWqodXSCQ9tEPvUvyVIRm",
+  "raca": "Judeu afrodescendente",
+  "genero": "Indefinido",
+  "pcd": "Não",
+  "vulnerabilidade": "",
+  "__v": 0
+}]

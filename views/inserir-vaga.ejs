@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <title>Inserir Nova Vaga</title>
+</head>
+
+<header>
+    <div class="bloco-acess" id="fonte">
+        <p>
+            <span class="a-minus">A-</span> | <span class="a-plus">A+</span>
+        </p>
+    </div>
+    <div class="bloco-acess" id="alto-contraste">
+        <img src="/img/contraste.png" alt="Simbolo de contraste" class="simb-contraste" srcset="" />
+        <p>Alto Contraste</p>
+    </div>
+</header>
+
+<body>
+    <section class="header-principal">
+        <div class="block-header">
+            <div id="menu">
+                <div id="menu-bar" onclick="menuOnClick()">
+                    <div id="bar1" class="bar"></div>
+                    <div id="bar2" class="bar"></div>
+                    <div id="bar3" class="bar"></div>
+                </div>
+                <nav class="nav" id="nav">
+                    <ul>
+                        <li><a href="#">Meu Perfil</a></li>
+                        <li><a href="#">Processos</a></li>
+                        <li><a href="/todas-vagas">Vagas</a></li>
+                        <li><a href="/">Sair</a></li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="menu-bg" id="menu-bg"></div>
+
+        </div>
+
+        <div class="block-header-logo">
+            <img src="/img/logo-everymind.png" alt="Logo Everymind" class="logo" />
+        </div>
+
+    </section>
+    <h1 class="vagas-inserir">Inserir Nova Vaga</h1>
+    <form action="/inserir-vaga" method="post" class="form-vaga">
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required class="input-vagas">
+        <br>
+        <label for="empresa">Empresa:</label>
+        <input type="text" id="empresa" name="empresa" required class="input-vagas">
+        <br>
+        <label for="cargo_de_atuacao">Cargo de Atuação:</label>
+        <input type="text" id="cargo_de_atuacao" name="cargo_de_atuacao" required class="input-vagas">
+        <br>
+        <label for="salario">Salário:</label>
+        <input type="text" id="salario" name="salario" required class="input-vagas">
+        <br>
+        <label for="local">Local:</label>
+        <input type="text" id="local" name="local" required class="input-vagas">
+        <br>
+        <label for="descricao">Descrição:</label>
+        <textarea id="descricao" name="descricao" required class="input-vagas"></textarea>
+        <br>
+        <div class="btnSearch">
+            <button class="botaoSearch">
+                <input type="submit" value="Inserir" class="inserir-vaga">
+            </button>
+        </div>
+    </form>
+    <script src="/js/script.js"></script>
+</body>
+
+<footer>
+    <div class="logo-footer">
+        <img src="../img/logo-everymind.png" alt="Logo EY">
+    </div>
+    <div class="social-media">
+
+        <img src="../img/5279111_network_fb_social media_facebook_facebook logo_icon 1.svg" alt="Logo facebook">
+
+
+        <img src="../img/2559760_media_social_video_youtube_icon 1.svg" alt="Logo Youtube">
+
+        <img src="../img/8666638_instagram_icon 1.svg" alt="Logo Instagram">
+
+    </div>
+</footer>

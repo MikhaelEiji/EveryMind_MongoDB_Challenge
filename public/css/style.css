@@ -1,0 +1,787 @@
+@import url('https://fonts.googleapis.com/css2?family=Hammersmith+One&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+body {
+    font-family: 'Hammersmith One', sans-serif;
+    background-color: #fff;
+    font-size: larger;
+}
+
+header {
+    height: 4.3125rem;
+    flex-shrink: 0;
+    background: #f4f6f7;
+    font-size: larger;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+
+.header-principal {
+    /* position: relative; */
+    height: 5.25rem;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+}
+
+.logo {
+    width: 140px;
+    height: 77px;
+    display: flex;
+    margin: auto;
+}
+
+.simb-contraste {
+    width: 2.625rem;
+    height: 2.625rem;
+    flex-shrink: 0;
+}
+
+.bloco-acess {
+    display: flex;
+    align-items: center;
+    float: right;
+    margin: 0 20px;
+    cursor: pointer;
+}
+
+#menu {
+    z-index: 2;
+}
+
+#menu-bar {
+    width: 45px;
+    height: 40px;
+    margin: 30px 0 20px 20px;
+    cursor: pointer;
+}
+
+.bar {
+    height: 5px;
+    width: 100%;
+    background-color: #333;
+    display: block;
+    border-radius: 5px;
+    transition: 0.3s ease;
+}
+
+#bar1 {
+    transform: translateY(-4px);
+}
+
+#bar3 {
+    transform: translateY(4px);
+}
+
+.nav {
+    transition: 0.3s ease;
+    display: none;
+}
+
+.nav ul {
+    padding: 0 22px;
+}
+
+.nav li {
+    list-style: none;
+    padding: 12px 0;
+}
+
+.nav li a {
+    color: #333;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.nav li a:hover {
+    font-weight: bold;
+}
+
+.menu-bg,
+#menu {
+    top: 0;
+    left: 0;
+    position: absolute;
+}
+
+.menu-bg {
+    z-index: 1;
+    width: 0;
+    height: 0;
+    margin: 30px 0 20px 20px;
+    background: radial-gradient(circle, #3B95D3, #2CB395);
+    border-radius: 50%;
+    transition: 0.3s ease;
+}
+
+.change {
+    display: block;
+}
+
+.change .bar {
+    background-color: #333;
+}
+
+.change #bar1 {
+    transform: translateY(4px) rotateZ(-45deg);
+}
+
+.change #bar2 {
+    opacity: 0;
+}
+
+.change #bar3 {
+    transform: translateY(-6px) rotateZ(45deg);
+}
+
+.change-bg {
+    width: 520px;
+    height: 460px;
+    transform: translate(-60%, -30%);
+}
+
+.block-header {
+    display: flex;
+    margin: 0 20px;
+}
+
+.block-header a {
+    color: #333;
+    text-decoration: none;
+}
+
+.block-header a:hover {
+    color: rebeccapurple !important;
+    cursor: pointer;
+}
+
+.block-header-logo {
+    margin: 47%;
+    position: absolute;
+    /* background-color: aqua; */
+}
+
+.botao-header a {
+    margin-right: 20px;
+    color: #2CB395;
+    text-decoration: none;
+}
+
+.botao-header a:hover {
+    color: #3B95D3 !important;
+    cursor: pointer;
+}
+
+.login {
+    background-color: aqua;
+}
+
+.login-button {
+    border-radius: 0.6875rem;
+    height: 30px;
+    width: 100px;
+    background: #3B95D3;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    font-size: medium;
+    font-family: 'Hammersmith One', sans-serif;
+}
+
+.login-button:hover {
+    cursor: pointer;
+    background-color: #2CB395;
+}
+
+.block-imagem {
+    height: fit-content;
+    width: fit-content;
+}
+
+.imagem-banner {
+    width: 100%;
+}
+
+.block-titulo {
+    width: 100%;
+    height: 30vh;
+    position: relative;
+    display: flex;
+}
+
+.titulo {
+    margin: auto;
+    text-align: center;
+}
+
+.divBusca {
+    padding: 50px;
+    text-align: center;
+    background-color: #D9D9D9;
+    display: block;
+}
+
+.busca {
+    display: inline;
+    margin: 100px auto;
+    /* background-color: aqua; */
+
+}
+
+.titulo-busca {
+    position: relative;
+    margin-bottom: 50px;
+}
+
+#txtBusca {
+    font-size: 18px;
+    width: 40vw;
+    height: 6vh;
+    border-radius: 11px;
+    background: #FFF;
+    padding: 0 10px;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+
+
+}
+
+.lupa {
+    width: 1%;
+}
+
+.btnPesquisa {
+    width: 15vw;
+    height: 6vh;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #3B95D3;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+
+    color: #000;
+    text-align: center;
+    font-family: Hammersmith One;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 135.523%;
+    /* 32.525px */
+}
+
+.btnPesquisa a {
+    text-decoration: none;
+}
+
+.btnPesquisa:hover {
+    cursor: pointer;
+    background-color: #2CB395;
+}
+
+.areasTrabalho {
+    color: #333;
+    text-align: center;
+    padding-top: 10%;
+    padding-bottom: 2%;
+}
+
+.areasTrabalho1 {
+    color: #333;
+    text-align: center;
+    padding-top: 2%;
+    padding-bottom: 10%;
+}
+
+.block-vagas {
+    /* background-color: aqua; */
+    width: 80%;
+    margin: 50px auto;
+    display: flex;
+    justify-content: space-between;
+}
+
+.vagas {
+    height: 200px;
+    width: 300px;
+    border-radius: 33px;
+    margin: 50px;
+    background: #3B95D3;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    text-align: center;
+}
+
+
+.vagas:hover {
+    cursor: pointer;
+    background: #2CB395;
+}
+
+.vagas img {
+    width: 30%;
+    height: 50%;
+    margin: 20px auto;
+}
+
+.vagas p {
+    font-size: 120%;
+    color: #333;
+}
+
+.vagas a {
+    font-size: 120%;
+    color: #333;
+    text-decoration: none;
+}
+
+.todasVagas {
+    width: 246px;
+    height: 57px;
+    border-radius: 11px;
+    background: #3B95D3;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    font-size: 120%;
+}
+
+.todasVagas a {
+    font-size: 120%;
+    color: #333;
+    text-decoration: none;
+}
+
+.todasVagas:hover {
+    cursor: pointer;
+    background-color: #2CB395;
+}
+
+.todosTech {
+    width: 46%;
+    height: 100px;
+    border-radius: 11px;
+    background: #3B95D3;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    font-size: 120%;
+}
+
+.todosTech a {
+    font-size: 120%;
+    color: #333;
+    text-decoration: none;
+}
+
+.todosTech:hover {
+    cursor: pointer;
+    background-color: #2CB395;
+}
+
+footer {
+    background: #f4f6f7;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo-footer {
+    width: 45%;
+    height: 100%;
+    margin: auto 15px;
+    /* background-color: #3B95D3; */
+}
+
+.logo-footer img {
+    margin: 2%;
+}
+
+.social-media {
+    display: flex;
+    width: 10%;
+    /*height: 100%; */
+    margin: auto 15px;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+
+/* Tela login-usuario */
+.login-button {
+    border-radius: 0.6875rem;
+    height: 30px;
+    width: 100px;
+    background: #3B95D3;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    font-size: medium;
+    font-family: 'Hammersmith One', sans-serif;
+    color: #FFF;
+}
+
+.divLogin {
+    display: block;
+    width: 50%;
+    height: 520px;
+    margin: 100px auto;
+    border-radius: 20px;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 30px;
+}
+
+.logo-login {
+    display: flex;
+    /* background-color: #3B95D3; */
+    width: 40%;
+    align-content: center;
+    margin: 20px auto;
+}
+
+.inputs-login {
+    height: fit-content;
+    width: 318px;
+    /* background-color: aqua; */
+    display: block;
+    align-items: center;
+    margin: 30px auto;
+    padding: 10px;
+}
+
+.divLogin img {
+    margin: auto;
+}
+
+/*
+.divLogin input {
+
+}
+*/
+/* .divLogin button {
+    background-color: #3B95D3;
+    width: 215px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    font-size: large;
+} */
+
+.botao-login {
+    /* background-color: aqua; */
+    margin: auto;
+    width: 47%;
+    display: flex;
+}
+
+.botao-confirmar {
+    background-color: #3B95D3;
+    margin: 2%;
+    width: 215px;
+    height: 52px;
+    border-radius: 11px;
+    font-size: large;
+}
+
+#inputLogin {
+    width: 318px;
+    height: 47px;
+    border-radius: 7px;
+    border: 1px solid #000;
+    background: #FFF;
+    font-family: 'Hammersmith One', sans-serif;
+    font-size: large;
+    margin: 20px auto;
+    padding-left: 15px;
+}
+
+.divTextoLogin {
+    margin: 20px auto;
+    font-size: small;
+    width: fit-content;
+    font-family: 'Hammersmith One', sans-serif;
+}
+
+
+/* Tela vagas */
+.search {
+    width: 60%;
+    height: 263px;
+    flex-shrink: 0;
+    border-radius: 11px;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    margin: 25px auto;
+    padding-top: 15px;
+}
+
+.tituloSearch {
+    color: #000;
+    font-family: Hammersmith One;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 135.523%;
+    /* 32.525px */
+    /* background-color: #2CB395; */
+    display: flex;
+    width: fit-content;
+    margin: 20px auto;
+}
+
+.inputsSearch {
+    /* background-color: #2CB395; */
+    display: flex;
+    padding: 20px 100px;
+    justify-content: space-between;
+}
+
+.inputsSearch input {
+    width: 40%;
+    height: 30px;
+    border-radius: 7px;
+    border: 1px solid #000;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    padding: 0 10px;
+}
+
+.botaoSearch {
+    width: 100%;
+    height: 45px;
+    border-radius: 11px;
+    background: #2CB395;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    text-decoration: none;
+    color: #FFF;
+    font-size: medium;
+    margin: auto;
+}
+
+.btnSearch {
+    width: 20%;
+    margin: 20px auto;
+}
+
+.qtdVagas {
+    text-align: center;
+    color: #333;
+    margin: 5% 7% 5% 7%;
+}
+
+.qntVagas {
+    text-align: center;
+    color: #333;
+    margin: 5% 7% 5% 7%;
+}
+
+.resultadosVagas {
+    text-align: center;
+    color: #333;
+}
+
+.todasVagasEncontradas {
+    color: #333;
+    margin: 5% 7% 5% 7%;
+}
+
+.todasVagasEncontradasCard {
+    border: 1px solid;
+    border-radius: 15px;
+    margin: 5%;
+    padding: 2%;
+}
+
+.vagasDisponiveis {
+    width: 80%;
+    height: 230px;
+    border-radius: 11px;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    margin: auto;
+    padding: 20px;
+}
+
+.btnVaga {
+    width: 154px;
+    height: 52px;
+    flex-shrink: 0;
+    background-color: #2CB395;
+    border: solid 1px;
+    border-radius: 15px;
+    color: #FFF;
+    font-size: medium;
+    margin: auto;
+}
+
+.form-vaga {
+    width: 40%;
+    text-align: center;
+    color: #333;
+    border: 1px solid;
+    border-radius: 15px;
+    margin: 2% 25% 2% 25%;
+    padding: 2%;
+}
+
+.vagas-inserir {
+    text-align: center;
+    color: #333;
+}
+
+.input-vagas {
+    border: 1px solid;
+    border-radius: 15px;
+}
+
+.input-vulnerabilidade {
+    border: 1px solid;
+    border-radius: 15px;
+    align-items: center;
+}
+
+.inserir-vaga {
+    font-size: large;
+    background-color: transparent;
+}
+
+.input-form {
+    width: 100%;
+    margin: 2% 2% 2% 0;
+    border: 1px solid;
+    border-radius: 15px;
+    padding: 2%;
+}
+
+.input-form1 {
+    width: 70%;
+    margin: 1% 1% 1% 0;
+    border: 1px solid;
+    border-radius: 15px;
+    padding: 1%;
+}
+
+.cadastro {
+    text-decoration: none;
+    color: #3B95D3;
+    background-color: #FFF;
+}
+
+.divVagas-Candidaturas{
+    border: 1px solid;
+    border-radius: 15px;
+    margin: 2%;
+    padding: 2%;
+}
+
+.botaoSearch a{
+    text-decoration: none;
+}
+
+.saudacao {
+    width: 100%;
+    margin: 2%;
+    padding: 2%;
+    text-align: center;
+}
+
+.todasCandidaturasTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.todasCandidaturasTable th,
+.todasCandidaturasTable td {
+    border: 1px solid #000; /* Adiciona linhas pretas */
+    padding: 8px; /* Espaçamento interno */
+    text-align: center; /* Centraliza o texto */
+}
+
+.todasCandidaturasTable th {
+    background-color: #f0f0f0; /* Cor de fundo para o cabeçalho */
+}
+
+.todasCandidaturasTable button {
+    padding: 5px 10px; /* Espaçamento interno do botão */
+    text-align: center; /* Centraliza o texto do botão */
+    display: block; /* Torna o botão uma linha separada */
+    margin: 0 auto; /* Centraliza o botão horizontalmente */
+}
+
+
+@media only screen and (max-width: 600px) {
+    .block-header {
+        display: block;
+    }
+
+    body {
+        font-family: 'Hammersmith One', sans-serif;
+        background-color: #333;
+        font-size: smaller;
+    }
+
+    .logo {
+        margin-left: -20px;
+    }
+
+    .block-titulo {
+        width: 80vw;
+        margin: -50px auto;
+    }
+
+    .busca {
+        display: block;
+        width: 80%;
+        margin: 10px auto;
+        /* background-color: aqua; */
+    }
+
+    .divBusca {
+        padding: 20px
+    }
+
+    .titulo-busca {
+        margin: 20px auto;
+    }
+
+    #txtBusca {
+        width: 90%;
+        height: 3vh;
+
+    }
+
+    .btnPesquisa {
+        margin: 20px;
+        font-size: small;
+        width: 50%;
+    }
+
+    .block-vagas {
+        display: block;
+        width: 90%;
+        margin: 0 auto;
+        /* width: 50%; */
+    }
+
+    .vagas {
+        width: 50%;
+        height: 40%;
+        margin: 20px auto;
+        font-size: 100%;
+        padding: 10px;
+    }
+
+    .social-media {
+        display: flex;
+        width: 30%;
+        /*height: 100%; */
+        margin: auto 15px;
+        justify-content: space-between;
+    }
+
+    .divLogin {
+        width: 90%;
+    }
+
+
+}
