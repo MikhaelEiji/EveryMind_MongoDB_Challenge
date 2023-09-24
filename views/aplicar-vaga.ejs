@@ -49,32 +49,32 @@
 
     </section>
 
-    <form action="/pesquisar" method="get">
+    <!-- <form action="/pesquisar" method="get">
         <div class="tituloSearch">
             <p>Encontre as melhores vagas para você!</p>
         </div>
         <div class="inputsSearch">
-            <input type="text" placeholder="Cargo de atuacao" name="q_cargo"> <!-- Adicione name="q_cargo" -->
-            <input type="text" placeholder="Local" name="q_local"> <!-- Adicione name="q_local" -->
+            <input type="text" placeholder="Cargo de atuacao" name="q_cargo"> 
+            <input type="text" placeholder="Local" name="q_local"> 
         </div>
         <div class="btnSearch">
             <button class="botaoSearch">Buscar Vagas</button>
         </div>
-    </form>
+    </form> -->
 
     <h1 class="qntVagas">Vaga: (<span id="quantidadeVagas">
             <%= vaga.titulo %>
         </span>)</h1>
-    <form action="/aplicar-vaga/<%= vaga._id %>" method="post" enctype="multipart/form-data">
+    <form action="/aplicar-vaga/<%= vaga._id %>" method="post" enctype="multipart/form-data" class="form-aplicar">
         <label for="cel">Celular:</label>
-        <input type="text" id="cel" name="cel" required class="input-vagas">
+        <input type="text" id="cel" name="cel" required class="input-celular">
         <br>
-        <label for="pdfFile">Seu Curriculo</label>
+        <label for="pdfFile">Seu Currículo:</label>
         <input type="file" id="pdfFile" name="pdfFile" accept="pdf/*" required>
         <br>
         <div class="btnSearch">
-            <button class="botaoSearch">
-                <input type="submit" value="Inserir" class="inserir-vaga">
+            <button class="botaoSearch-aplicar">
+                <input type="submit" value="Aplicar" class="inserir-vaga">
             </button>
         </div>
     </form>

@@ -421,8 +421,8 @@ footer {
 .divLogin {
     display: block;
     width: 50%;
-    height: 520px;
-    margin: 100px auto;
+    height: 600px;
+    margin: 60px auto;
     border-radius: 20px;
     background: #FFF;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
@@ -474,13 +474,21 @@ footer {
     display: flex;
 }
 
+#loginForm{
+    width: fit-content;
+    /* background-color: #2CB395; */
+}
 .botao-confirmar {
     background-color: #3B95D3;
-    margin: 2%;
+    display: flex;
+    margin: 10px auto;
     width: 215px;
     height: 52px;
     border-radius: 11px;
     font-size: large;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 #inputLogin {
@@ -531,12 +539,23 @@ footer {
 
 .inputsSearch {
     /* background-color: #2CB395; */
+    margin: auto;
+    width: 700px;
     display: flex;
     padding: 20px 100px;
     justify-content: space-between;
 }
 
-.inputsSearch input {
+.inputsSearch-vagas {
+    /* background-color: #2CB395; */
+    margin: auto;
+    width: 700px;
+    display: flex;
+    padding: 20px 100px;
+    justify-content: space-between;
+}
+
+/* .inputsSearch input {
     width: 40%;
     height: 30px;
     border-radius: 7px;
@@ -544,6 +563,13 @@ footer {
     background: #FFF;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     padding: 0 10px;
+} */
+
+.botaoVoltar{
+    width: 100px;
+    margin-left: -20px;
+    background-color: #2CB395;
+    display: flex;
 }
 
 .botaoSearch {
@@ -560,6 +586,7 @@ footer {
 
 .btnSearch {
     width: 20%;
+    display: flex;
     margin: 20px auto;
 }
 
@@ -590,6 +617,7 @@ footer {
     border-radius: 15px;
     margin: 5%;
     padding: 2%;
+    background-color: #f4f6f7;
 }
 
 .vagasDisponiveis {
@@ -630,8 +658,15 @@ footer {
 }
 
 .input-vagas {
-    border: 1px solid;
-    border-radius: 15px;
+    width: 500px;
+    height: 20px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    border: 1px solid #000;
+    background: #FFF;
+    margin: 10px auto;
+    padding: 0 10px;
+    font-family:  'Hammersmith One', sans-serif;
 }
 
 .input-vulnerabilidade {
@@ -643,14 +678,31 @@ footer {
 .inserir-vaga {
     font-size: large;
     background-color: transparent;
+    
 }
 
 .input-form {
-    width: 100%;
-    margin: 2% 2% 2% 0;
-    border: 1px solid;
-    border-radius: 15px;
-    padding: 2%;
+    width: 318px;
+    height: 67px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    border: 1px solid #000;
+    background: #FFF;
+    margin: 10px auto;
+    padding: 0 10px;
+    font-family:  'Hammersmith One', sans-serif;
+}
+
+.input-form-vaga {
+    width: 318px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    border: 1px solid #000;
+    background: #FFF;
+    margin: 10px auto;
+    padding: 0 10px;
+    font-family:  'Hammersmith One', sans-serif;
 }
 
 .input-form1 {
@@ -667,22 +719,23 @@ footer {
     background-color: #FFF;
 }
 
-.divVagas-Candidaturas{
+.divVagas-Candidaturas {
     border: 1px solid;
     border-radius: 15px;
     margin: 2%;
     padding: 2%;
 }
 
-.botaoSearch a{
+.botaoSearch a {
     text-decoration: none;
 }
 
 .saudacao {
-    width: 100%;
-    margin: 2%;
+    width: fit-content;
+    margin: auto;
     padding: 2%;
     text-align: center;
+    /* background-color: #2CB395; */
 }
 
 .todasCandidaturasTable {
@@ -692,20 +745,70 @@ footer {
 
 .todasCandidaturasTable th,
 .todasCandidaturasTable td {
-    border: 1px solid #000; /* Adiciona linhas pretas */
-    padding: 8px; /* Espaçamento interno */
-    text-align: center; /* Centraliza o texto */
+    border: 1px solid #000;
+    /* Adiciona linhas pretas */
+    padding: 8px;
+    /* Espaçamento interno */
+    text-align: center;
+    /* Centraliza o texto */
 }
 
 .todasCandidaturasTable th {
-    background-color: #f0f0f0; /* Cor de fundo para o cabeçalho */
+    background-color: #f0f0f0;
+    /* Cor de fundo para o cabeçalho */
 }
 
 .todasCandidaturasTable button {
-    padding: 5px 10px; /* Espaçamento interno do botão */
-    text-align: center; /* Centraliza o texto do botão */
-    display: block; /* Torna o botão uma linha separada */
-    margin: 0 auto; /* Centraliza o botão horizontalmente */
+    padding: 5px 10px;
+    /* Espaçamento interno do botão */
+    text-align: center;
+    /* Centraliza o texto do botão */
+    display: block;
+    /* Torna o botão uma linha separada */
+    margin: 0 auto;
+    /* Centraliza o botão horizontalmente */
+}
+
+.form-aplicar{
+    /* background-color: #2CB395; */
+    width: fit-content;
+    margin: auto;
+    align-items:center ;
+    display: block;
+    padding: auto;
+}
+/* 
+.form-aplicar input{
+    width: fit-content;
+    margin: 20px auto;
+    margin-left: 10px;
+} */
+
+.input-celular{
+    /* background-color: #2CB395; */
+    width: 250px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 7px;
+    border: 1px solid #000;
+    background: #FFF;
+    margin: 30px auto;
+    padding: 0 10px;
+    font-family:  'Hammersmith One', sans-serif;
+
+}
+
+.botaoSearch-aplicar{
+    background-color: #3B95D3;
+    position: relative;
+    margin: 10px auto;
+    width: 215px;
+    height: 52px;
+    border-radius: 11px;
+    font-size: large;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
 
 
@@ -721,7 +824,9 @@ footer {
     }
 
     .logo {
-        margin-left: -20px;
+        width: 93.5px;
+        height: 51.5px;
+        margin-left: -30px;
     }
 
     .block-titulo {
@@ -780,8 +885,51 @@ footer {
     }
 
     .divLogin {
-        width: 90%;
+        margin-top: -20px;
+        width: 110%;
     }
 
+    .divLogin {
+       
+        width: 80%;
+        height: 600px;
+        margin: 60px auto;
+        
+    }
+
+    .input-form {
+        width: 85%;
+        height: 67px;
+        flex-shrink: 0;
+        border-radius: 7px;
+        border: 1px solid #000;
+        background: #FFF;
+        margin: 10px auto;
+        padding: 0 10px;
+        font-family:  'Hammersmith One', sans-serif;
+    }
+
+    .inputsSearch-vagas {
+        
+        /* background-color: #2CB395; */
+        margin: auto;
+        width: fit-content;
+        display: block;
+        padding: 20px 100px;
+        justify-content: center;
+    }
+
+    .input-form-vaga {
+        width: 200px;
+        height: 40px;
+        flex-shrink: 0;
+        border-radius: 7px;
+        border: 1px solid #000;
+        background: #FFF;
+        margin: 10px auto;
+        padding: 0 10px;
+        font-family:  'Hammersmith One', sans-serif;
+    }
+    
 
 }
