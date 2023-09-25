@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const techSchema = new mongoose.Schema({
-  username: String,
+  nome: String,
   email: String,
   senha: String,
 });

@@ -29,7 +29,7 @@ function alteraCorDeFundo(darkMode) {
     body.style.backgroundColor = "#333"
     texto.forEach(function (elemento) {
       elemento.style.color = "#fff"
-    }) 
+    })
     // texto.style.color = "#fff"
     texto2.style.color = "#fff"
   } else {
@@ -56,14 +56,107 @@ fonteElement.addEventListener("click", (event) => {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    const pcdSelect = document.getElementById("pcd");
-    const vulnerabilidadeInput = document.getElementById("vulnerabilidade");
+  const pcdSelect = document.getElementById("pcd");
+  const vulnerabilidadeInput = document.getElementById("vulnerabilidade");
 
-    pcdSelect.addEventListener("change", function () {
-        if (pcdSelect.value === "Sim") {
-            vulnerabilidadeInput.style.display = "flex";
-        } else {
-            vulnerabilidadeInput.style.display = "none";
-        }
-    });
+  pcdSelect.addEventListener("change", function () {
+    if (pcdSelect.value === "Sim") {
+      vulnerabilidadeInput.style.display = "flex";
+    } else {
+      vulnerabilidadeInput.style.display = "none";
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const senhaInput = document.getElementById('senha');
+  const senhaRequirements = document.getElementById('senha-requirements');
+  const lengthRequirement = document.getElementById('length');
+  const uppercaseRequirement = document.getElementById('uppercase');
+  const numberRequirement = document.getElementById('number');
+  const specialRequirement = document.getElementById('special');
+
+  senhaInput.addEventListener('input', function () {
+    const senha = senhaInput.value;
+
+    // Verifique o comprimento da senha
+    const isLengthValid = senha.length >= 8;
+    lengthRequirement.classList.toggle('valid', isLengthValid);
+    lengthRequirement.classList.toggle('invalid', !isLengthValid);
+
+    // Verifique se há pelo menos uma letra maiúscula
+    const hasUppercase = /[A-Z]/.test(senha);
+    uppercaseRequirement.classList.toggle('valid', hasUppercase);
+    uppercaseRequirement.classList.toggle('invalid', !hasUppercase);
+
+    // Verifique se há pelo menos um número
+    const hasNumber = /\d/.test(senha);
+    numberRequirement.classList.toggle('valid', hasNumber);
+    numberRequirement.classList.toggle('invalid', !hasNumber);
+
+    // Verifique se há pelo menos um caractere especial
+    const hasSpecial = /[@$!%*?&]/.test(senha);
+    specialRequirement.classList.toggle('valid', hasSpecial);
+    specialRequirement.classList.toggle('invalid', !hasSpecial);
+  });
+
+  // Adicione um evento blur (quando o foco sai) ao campo de senha
+  senhaInput.addEventListener('blur', function () {
+    senhaRequirements.style.display = 'none';
+  });
+
+  // Adicione um evento focus (quando o foco entra) ao campo de senha
+  senhaInput.addEventListener('focus', function () {
+    senhaRequirements.style.display = 'block';
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const senhaInput = document.getElementById('senha');
+  const senhaRequirements = document.getElementById('senha-requirements');
+
+  senhaInput.addEventListener('input', function () {
+    // Verifique se o campo de senha não está vazio
+    if (senhaInput.value.trim() === '') {
+      senhaRequirements.style.display = 'none';
+    } else {
+      senhaRequirements.style.display = 'block';
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const nomeInput = document.getElementById('nome');
+  const nomeWarning = document.getElementById('nome-warning');
+
+  nomeInput.addEventListener('input', function () {
+    const nome = nomeInput.value;
+
+    // Verifique se o "nome" contém números
+    const hasNumbers = /\d/.test(nome);
+
+    if (hasNumbers) {
+      nomeWarning.style.display = 'block'; // Exibe o aviso
+    } else {
+      nomeWarning.style.display = 'none'; // Oculta o aviso
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  const emailInput = document.getElementById('email');
+  const emailWarning = document.getElementById('email-warning');
+
+  emailInput.addEventListener('input', function () {
+    const email = emailInput.value;
+
+    // Verifique se o email contém o símbolo "@"
+    const hasAtSymbol = email.includes('@');
+
+    if (!hasAtSymbol) {
+      emailWarning.style.display = 'block'; // Exibe o aviso
+    } else {
+      emailWarning.style.display = 'none'; // Oculta o aviso
+    }
+  });
 });

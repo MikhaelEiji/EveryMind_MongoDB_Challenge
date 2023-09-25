@@ -70,6 +70,11 @@ var user = '';
 var techRecruiter = '';
 var everyMind = '';
 
+function hasSpecialCharacter(senha) {
+    const specialCharacters = ['@', '$', '!', '%', '*', '?', '&'];
+    return specialCharacters.some(char => senha.includes(char));
+}
+
 app.get(ROUTE_HOME, (req, res) => {
     res.render('home');
 });
@@ -92,7 +97,7 @@ app.get(ROUTE_TODAS_VAGAS, async (req, res) => {
     }
 });
 
-app.post(ROUTE_TODAS_VAGAS, async (req,res) => {
+app.post(ROUTE_TODAS_VAGAS, async (req, res) => {
     // const user = await User.findOne(req.params.id);
     res.render('todas-vagas', { user });
 });
@@ -109,7 +114,7 @@ app.get(ROUTE_TODAS_VAGAS_DISPONIVEIS, async (req, res) => {
     }
 });
 
-app.post(ROUTE_TODAS_VAGAS_DISPONIVEIS, async (req,res) => {
+app.post(ROUTE_TODAS_VAGAS_DISPONIVEIS, async (req, res) => {
     // const user = await User.findOne(req.params.id);
     res.render('todas-vagas', { user });
 });
@@ -339,15 +344,35 @@ app.get(ROUTE_INSERIR_USUARIO, (req, res) => {
 });
 
 app.post(ROUTE_INSERIR_USUARIO, async (req, res) => {
-    const { username, email, senha, raca, genero, pcd, vulnerabilidade } = req.body;
+    const { nome, email, senha, raca, genero, pcd, vulnerabilidade } = req.body;
 
     try {
+        // Verifique se o "nome" contém apenas letras (sem números)
+        const nomeRegex = /^[A-Za-z]+$/;
+
+        if (!nomeRegex.test(nome)) {
+            return res.status(400).send('O "nome" deve conter apenas letras (sem números ou caracteres especiais).');
+        }
+
+        // Defina a expressão regular para verificar os requisitos
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+
+        // Verifique se a senha atende aos requisitos mínimos
+        if (!regex.test(senha)) {
+            return res.status(400).send('A senha não atende aos requisitos mínimos.');
+        }
+
+        // Verifique se a senha contém pelo menos um caractere especial
+        if (!hasSpecialCharacter(senha)) {
+            return res.status(400).send('A senha deve conter pelo menos um caractere especial.');
+        }
+
         // Gere um hash de senha usando o bcrypt
         const hashedSenha = await bcrypt.hash(senha, 10);
 
         // Crie um novo usuário com a senha criptografada
         const novoUsuario = new User({
-            username,
+            nome,
             email,
             senha: hashedSenha,
             raca,
@@ -403,7 +428,7 @@ app.post(ROUTE_LOGIN_TECHRECRUITER, async (req, res) => {
 
 // Rota para Voltar
 app.get(ROUTE_USUARIO_LOGADO, (req, res) => {
-    res.render('usuario-logado', {user});
+    res.render('usuario-logado', { user });
 });
 
 // Rota para Voltar
@@ -415,12 +440,12 @@ app.post(ROUTE_USUARIO_LOGADO, async (req, res) => {
 
 // Rota para Voltar
 app.get(ROUTE_TECHRECRUITER_LOGADO, (req, res) => {
-    res.render('techrecruiter-logado', {techRecruiter});
+    res.render('techrecruiter-logado', { techRecruiter });
 });
 
 // Rota para Voltar
 app.get(ROUTE_EVERYMIND_LOGADO, (req, res) => {
-    res.render('EveryMind-logado', {everyMind});
+    res.render('EveryMind-logado', { everyMind });
 });
 
 // Rota para inserção de Tech Recruiter
@@ -429,15 +454,35 @@ app.get(ROUTE_INSERIR_TECHRECRUITER, (req, res) => {
 });
 
 app.post(ROUTE_INSERIR_TECHRECRUITER, async (req, res) => {
-    const { username, email, senha } = req.body;
+    const { nome, email, senha } = req.body;
 
     try {
+        // Verifique se o "nome" contém apenas letras (sem números)
+        const nomeRegex = /^[A-Za-z]+$/;
+
+        if (!nomeRegex.test(nome)) {
+            return res.status(400).send('O "nome" deve conter apenas letras (sem números ou caracteres especiais).');
+        }
+
+        // Defina a expressão regular para verificar os requisitos
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+
+        // Verifique se a senha atende aos requisitos mínimos
+        if (!regex.test(senha)) {
+            return res.status(400).send('A senha não atende aos requisitos mínimos.');
+        }
+
+        // Verifique se a senha contém pelo menos um caractere especial
+        if (!hasSpecialCharacter(senha)) {
+            return res.status(400).send('A senha deve conter pelo menos um caractere especial.');
+        }
+
         // Gere um hash de senha usando o bcrypt
         const hashedSenha = await bcrypt.hash(senha, 10);
 
         // Crie um novo Tech Recruiter com a senha criptografada
         const novoTechRecruiter = new TechRecruiter({
-            username,
+            nome,
             email,
             senha: hashedSenha,
         });
@@ -478,7 +523,7 @@ app.post(ROUTE_LOGIN_EVERYMIND, async (req, res) => {
         }
 
         // Autenticação bem-sucedida
-        res.render('EveryMind-logado', {everyMind});
+        res.render('EveryMind-logado', { everyMind });
 
     } catch (error) {
         console.error('Erro no login de EveryMind:', error);
@@ -491,15 +536,35 @@ app.get(ROUTE_INSERIR_EVERYMIND, (req, res) => {
 });
 
 app.post(ROUTE_INSERIR_EVERYMIND, async (req, res) => {
-    const { username, email, senha } = req.body;
+    const { nome, email, senha } = req.body;
 
     try {
+        // Verifique se o "nome" contém apenas letras (sem números)
+        const nomeRegex = /^[A-Za-z]+$/;
+
+        if (!nomeRegex.test(nome)) {
+            return res.status(400).send('O "nome" deve conter apenas letras (sem números ou caracteres especiais).');
+        }
+
+        // Defina a expressão regular para verificar os requisitos
+        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
+
+        // Verifique se a senha atende aos requisitos mínimos
+        if (!regex.test(senha)) {
+            return res.status(400).send('A senha não atende aos requisitos mínimos.');
+        }
+
+        // Verifique se a senha contém pelo menos um caractere especial
+        if (!hasSpecialCharacter(senha)) {
+            return res.status(400).send('A senha deve conter pelo menos um caractere especial.');
+        }
+
         // Gere um hash de senha usando o bcrypt
         const hashedSenha = await bcrypt.hash(senha, 10); // O número 10 é o custo de processamento, você pode ajustá-lo
 
         // Crie um novo usuário com a senha criptografada
         const novoEveryMind = new EveryMind({
-            username,
+            nome,
             email,
             senha: hashedSenha, // Armazene o hash da senha no banco de dados
         });
@@ -606,13 +671,13 @@ app.post(ROUTE_APLICAR_VAGA, upload.single('pdfFile'), async (req, res) => {
         // user = await User.findOne(req.params.id);
         // Recupere os dados do formulário
         const vagaId = req.params.id;
-        nome = user.username;
+        nome = user.nome;
         email = user.email;
         raca = user.raca;
         genero = user.genero;
         vulnerabilidade = user.vulnerabilidade;
-        const {cel} = req.body;
-        
+        const { cel } = req.body;
+
         // Verifique se a vaga com o ID fornecido existe
         const vaga = await Vaga.findById(vagaId);
         const techUser = vaga.tech;
@@ -682,8 +747,8 @@ app.get(ROUTE_TODAS_CANDIDATURAS, async (req, res) => {
         //     return res.redirect(ROUTE_LOGIN_TECHRECRUITER); // Redireciona para a página de login se o Tech Recruiter não estiver autenticado ou não tiver a função correta.
         // }
 
-        // const techRecruiterUser = req.techRecruiter.username; // Supondo que o ID do Tech Recruiter esteja disponível no objeto de usuário.
-        const tech = techRecruiter.username
+        // const techRecruiterUser = req.techRecruiter.nome; // Supondo que o ID do Tech Recruiter esteja disponível no objeto de usuário.
+        const tech = techRecruiter.nome
         // console.log(tech);
         // Busque todas as candidaturas relacionadas ao Tech Recruiter logado com base no ID dele.
         const candidaturas = await AplicadoVaga.find({ tech });
@@ -718,7 +783,7 @@ app.get(ROUTE_VAGAS_APLICADAS_USUARIO, async (req, res) => {
         //     return res.redirect(ROUTE_LOGIN_TECHRECRUITER); // Redireciona para a página de login se o Tech Recruiter não estiver autenticado ou não tiver a função correta.
         // }
 
-        // const techRecruiterUser = req.techRecruiter.username; // Supondo que o ID do Tech Recruiter esteja disponível no objeto de usuário.
+        // const techRecruiterUser = req.techRecruiter.nome; // Supondo que o ID do Tech Recruiter esteja disponível no objeto de usuário.
         const email = user.email
         // Busque todas as candidaturas relacionadas ao Tech Recruiter logado com base no ID dele.
         const candidaturas = await AplicadoVaga.find({ email });
@@ -742,8 +807,8 @@ app.get(ROUTE_PESQUISAR_CANDIDATURA, async (req, res) => {
     try {
         let resultados;
         let query = "";
-        tech = techRecruiter.username // Certifique-se de definir a variável 'tech'
-        
+        tech = techRecruiter.nome // Certifique-se de definir a variável 'tech'
+
         if (queryNome && queryEmail) {
             // Se ambos os campos de pesquisa estão preenchidos, filtre com base em ambos
             resultados = await AplicadoVaga.find({
@@ -787,7 +852,7 @@ app.get(ROUTE_PESQUISAR_CANDIDATURA_ADMIN, async (req, res) => {
     try {
         let resultados;
         let query = "";
-        
+
         if (queryNome && queryEmail) {
             // Se ambos os campos de pesquisa estão preenchidos, filtre com base em ambos
             resultados = await AplicadoVaga.find({
