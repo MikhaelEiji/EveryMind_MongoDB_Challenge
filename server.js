@@ -17,7 +17,7 @@ const PDFModel = require('./models/PDFModel');
 const app = express()
 
 //
-mongoose.connect('mongodb://127.0.0.1/EveryMind', {
+mongoose.connect('mongodb://localhost/EveryMind', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });

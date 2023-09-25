@@ -5,6 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
+
     <title>Inserir Nova Vaga</title>
 </head>
 
@@ -48,31 +50,32 @@
         </div>
 
     </section>
-    <h1 class="vagas-inserir">Inserir Novo Usuario</h1>
+    <h1 class="vagas-inserir texto">Inserir Novo Usuario</h1>
     <form action="/inserir-usuario" method="post" class="form-vaga">
         <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required class="input-vagas">
+        <input type="text" id="username" name="username" required class="input-field col s6">
         <br>
         <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required class="input-vagas">
+        <input type="email" id="email" name="email" required class="input-field col s6">
         <br>
         <label for="senha">Senha:</label>
-        <input type="password" id="senha" name="senha" required class="input-vagas">
+        <input type="password" id="senha" name="senha" required class="input-field col s6">
         <br>
         <label for="raca">Raça:</label>
-        <input type="text" id="raca" name="raca" required class="input-vagas">
+        <input type="text" id="raca" name="raca" required class="input-field col s6">
         <br>
         <label for="genero">Genero:</label>
-        <input type="text" id="genero" name="genero" required class="input-vagas">
+        <input type="text" id="genero" name="genero" required class="input-field col s6">
         <br>
         <label for="pcd">Possui alguma deficiência? Se sim, qual ?</label>
-        <!-- <input type="text" id="vulnerabilidade" name="vulnerabilidade" required class="input-vagas"> -->
-        <select id="pcd" name="pcd" required class="input-vagas">
-            <option value="Não">Não</option>
+        <!-- <input type="text" id="vulnerabilidade" name="vulnerabilidade" required class="input-field col s6"> -->
+        <select id="pcd" name="pcd" required class="browser-default selectinput">
+            <option value="Não" selected>Não</option>
             <option value="Sim">Sim</option>
         </select>
         <br>
-        <input type="text" id="vulnerabilidade" name="vulnerabilidade" class="input-vulnerabilidade" style="display:none;">
+        <input type="text" id="vulnerabilidade" name="vulnerabilidade" class="input-vulnerabilidade"
+            style="display:none;">
         <div class="btnSearch">
             <button class="botaoSearch">
                 <input type="submit" value="Inserir" class="inserir-vaga">

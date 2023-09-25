@@ -289,6 +289,7 @@ header {
     color: #333;
     text-align: center;
     justify-content: space-between;
+    margin-bottom: 100px;
 }
 
 .areasTrabalho1 {
@@ -408,6 +409,7 @@ footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    bottom: 0;
 }
 
 .logo-footer {
@@ -499,10 +501,11 @@ footer {
     display: flex;
 }
 
-#loginForm{
+#loginForm {
     width: fit-content;
     /* background-color: #2CB395; */
 }
+
 .botao-confirmar {
     background-color: #3B95D3;
     display: flex;
@@ -590,7 +593,7 @@ footer {
     padding: 0 10px;
 } */
 
-.botaoVoltar{
+.botaoVoltar {
     width: 100px;
     margin-left: -20px;
     background-color: #2CB395;
@@ -692,7 +695,7 @@ footer {
     background: #FFF;
     margin: 10px auto;
     padding: 0 10px;
-    font-family:  'Hammersmith One', sans-serif;
+    font-family: 'Hammersmith One', sans-serif;
 }
 
 .input-vulnerabilidade {
@@ -704,7 +707,7 @@ footer {
 .inserir-vaga {
     font-size: large;
     background-color: transparent;
-    
+
 }
 
 .input-form {
@@ -716,7 +719,7 @@ footer {
     background: #FFF;
     margin: 10px auto;
     padding: 0 10px;
-    font-family:  'Hammersmith One', sans-serif;
+    font-family: 'Hammersmith One', sans-serif;
 }
 
 .input-form-vaga {
@@ -728,7 +731,7 @@ footer {
     background: #FFF;
     margin: 10px auto;
     padding: 0 10px;
-    font-family:  'Hammersmith One', sans-serif;
+    font-family: 'Hammersmith One', sans-serif;
 }
 
 .input-form1 {
@@ -743,7 +746,7 @@ footer {
     text-decoration: none;
     color: #3B95D3;
     background-color: #FFF;
-    width: 100px; 
+    width: 100px;
 }
 
 .divVagas-Candidaturas {
@@ -796,14 +799,15 @@ footer {
     /* Centraliza o botão horizontalmente */
 }
 
-.form-aplicar{
+.form-aplicar {
     /* background-color: #2CB395; */
     width: fit-content;
     margin: auto;
-    align-items:center ;
+    align-items: center;
     display: block;
     padding: auto;
 }
+
 /* 
 .form-aplicar input{
     width: fit-content;
@@ -811,7 +815,7 @@ footer {
     margin-left: 10px;
 } */
 
-.input-celular{
+.input-celular {
     /* background-color: #2CB395; */
     width: 250px;
     height: 30px;
@@ -821,11 +825,11 @@ footer {
     background: #FFF;
     margin: 30px auto;
     padding: 0 10px;
-    font-family:  'Hammersmith One', sans-serif;
+    font-family: 'Hammersmith One', sans-serif;
 
 }
 
-.botaoSearch-aplicar{
+.botaoSearch-aplicar {
     background-color: #3B95D3;
     position: relative;
     margin: 10px auto;
@@ -838,6 +842,10 @@ footer {
     cursor: pointer;
 }
 
+.selectinput {
+    color: #333 !important;
+}
+
 
 @media only screen and (max-width: 600px) {
     .block-header {
@@ -846,8 +854,9 @@ footer {
 
     body {
         font-family: 'Hammersmith One', sans-serif;
-        background-color: #333;
+        /* background-color: #333; */
         font-size: smaller;
+        padding-bottom: 100px;
     }
 
     .logo {
@@ -917,11 +926,11 @@ footer {
     }
 
     .divLogin {
-       
+
         width: 80%;
         height: 600px;
         margin: 60px auto;
-        
+
     }
 
     .input-form {
@@ -933,11 +942,11 @@ footer {
         background: #FFF;
         margin: 10px auto;
         padding: 0 10px;
-        font-family:  'Hammersmith One', sans-serif;
+        font-family: 'Hammersmith One', sans-serif;
     }
 
     .inputsSearch-vagas {
-        
+
         /* background-color: #2CB395; */
         margin: auto;
         width: 100px;
@@ -955,7 +964,7 @@ footer {
         background: #FFF;
         margin: 10px auto;
         padding: 0 10px;
-        font-family:  'Hammersmith One', sans-serif;
+        font-family: 'Hammersmith One', sans-serif;
     }
 
 
@@ -981,20 +990,20 @@ footer {
         margin: 50px auto;
     }
 
-    .areasTrabalho1{
+    .areasTrabalho1 {
         display: block;
         width: 100%;
     }
 
-    .todosTech1{
+    .todosTech1 {
         width: 250px;
         margin: 20px auto;
 
     }
 
-    .botaoSearch{
+    .botaoSearch {
         width: 150px;
     }
-    
+
 
 }
