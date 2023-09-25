@@ -62,14 +62,14 @@
         </div>
     </form> -->
 
-    <h1 class="qntVagas">Vaga: (<span id="quantidadeVagas">
+    <h1 class="qntVagas texto">Vaga: (<span id="quantidadeVagas">
             <%= vaga.titulo %>
         </span>)</h1>
     <form action="/aplicar-vaga/<%= vaga._id %>" method="post" enctype="multipart/form-data" class="form-aplicar">
-        <label for="cel">Celular:</label>
+        <label class="texto" for="cel">Celular:</label>
         <input type="text" id="cel" name="cel" required class="input-celular">
         <br>
-        <label for="pdfFile">Seu Currículo:</label>
+        <label class="texto" for="pdfFile">Seu Currículo:</label>
         <input type="file" id="pdfFile" name="pdfFile" accept="pdf/*" required>
         <br>
         <div class="btnSearch">

@@ -50,23 +50,24 @@
   </section>
 
   <form action="/pesquisar" method="get">
-    <div class="tituloSearch">
+    <div class="tituloSearch texto" >
       <p>Encontre as melhores vagas para você!</p>
-    </div>
-    <div class="inputsSearch">
-      <input type="text" placeholder="Cargo de atuacao" name="q_cargo"> <!-- Adicione name="q_cargo" -->
-      <input type="text" placeholder="Local" name="q_local"> <!-- Adicione name="q_local" -->
-    </div>
-    <div class="btnSearch">
+  </div>
+  <div class="inputsSearch-vagas">
+      <input type="text" placeholder="Cargo de atuacao" name="q_cargo" class="input-form-vaga"> <!-- Adicione name="q_cargo" -->
+      <input type="text" placeholder="Local" name="q_local" class="input-form-vaga">  <!-- Adicione name="q_local" -->
+  </div>
+  <div class="btnSearch">
       <button class="botaoSearch">Buscar Vagas</button>
-    </div>
-    <div class="btnSearch">
+  </div>
+  <div class="btnSearch">
       <button class="botaoSearch">
           <a href="/usuario-logado">Voltar</a>
       </button>
   </div>
+
   </form>
-  <h1 class="qntVagas">Vagas Disponíveis: (<span id="quantidadeVagas">
+  <h1 class="qntVagas texto">Vagas Disponíveis: (<span id="quantidadeVagas">
       <%= resultados.length %>
     </span>)</h1>
   <p class="resultadosVagas">Resultados para "<%= query %>":</p>
@@ -89,6 +90,7 @@
         <p>
           <%= vaga.descricao %>
         </p>
+        <button><a href="/aplicar-vaga/<%= vaga._id %>">Quero me candidatar!</a></button>
       </li>
       <% }); %>
   </ul>

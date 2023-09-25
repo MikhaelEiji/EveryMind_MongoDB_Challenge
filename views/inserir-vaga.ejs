@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
     <title>Inserir Nova Vaga</title>
 </head>
 
@@ -48,25 +49,25 @@
         </div>
 
     </section>
-    <h1 class="vagas-inserir">Inserir Nova Vaga</h1>
+    <h2 class="vagas-inserir texto">Inserir Nova Vaga</h2>
     <form action="/inserir-vaga" method="post" class="form-vaga">
         <label for="titulo">Título:</label>
-        <input type="text" id="titulo" name="titulo" required class="input-vagas">
+        <input type="text" id="titulo" name="titulo" required class="input-field col s6">
         <br>
         <label for="empresa">Empresa:</label>
-        <input type="text" id="empresa" name="empresa" required class="input-vagas">
+        <input type="text" id="empresa" name="empresa" required class="input-field col s6">
         <br>
         <label for="cargo_de_atuacao">Cargo de Atuação:</label>
-        <input type="text" id="cargo_de_atuacao" name="cargo_de_atuacao" required class="input-vagas">
+        <input type="text" id="cargo_de_atuacao" name="cargo_de_atuacao" required class="input-field col s6">
         <br>
         <label for="salario">Salário:</label>
-        <input type="text" id="salario" name="salario" required class="input-vagas">
+        <input type="text" id="salario" name="salario" required class="input-field col s6">
         <br>
         <label for="local">Local:</label>
-        <input type="text" id="local" name="local" required class="input-vagas">
+        <input type="text" id="local" name="local" required class="input-field col s6">
         <br>
         <label for="descricao">Descrição:</label>
-        <textarea id="descricao" name="descricao" required class="input-vagas"></textarea>
+        <textarea id="descricao" name="descricao" required class="input-field col s6"></textarea>
         <br>
         <div class="btnSearch">
             <button class="botaoSearch">

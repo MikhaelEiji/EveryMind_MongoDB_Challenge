@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
     <title>Home</title>
 </head>
 
@@ -53,9 +54,9 @@
         <div class="tituloSearch">
             <p>Encontre as candidaturas!</p>
         </div>
-        <div class="inputsSearch">
-            <input type="text" placeholder="Nome" name="q_nome"> <!-- Adicione name="q_nome" -->
-            <input type="text" placeholder="Email" name="q_email"> <!-- Adicione name="q_email" -->
+        <div class="input-field col s6" style="width:50%; margin: auto;">
+            <input type="text" placeholder="Nome" class="validate" name="q_nome"> <!-- Adicione name="q_nome" -->
+            <input type="text" placeholder="Email" class="validate" name="q_email"> <!-- Adicione name="q_email" -->
         </div>
         <div class="btnSearch">
             <button class="botaoSearch">Buscar Candidatura</button>
@@ -65,7 +66,7 @@
     <h1 class="qntVagas">Candidaturas: (<span id="quantidadeVagas">
             <%= candidaturas.length %>
         </span>)</h1>    
-    <table class="todasCandidaturasTable">
+    <table style="width:80%; margin: auto;" class="bordered striped centered responsive-table">
         <thead>
             <tr>
                 <th>Vaga</th>
