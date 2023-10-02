@@ -34,7 +34,7 @@
             <li><a href="#">Meu Perfil</a></li>
             <li><a href="#">Processos</a></li>
             <li><a href="/todas-vagas-disponiveis">Vagas</a></li>
-            <li><a href="/">Sair</a></li>
+            <li><a href="/logout">Sair</a></li>
           </ul>
         </nav>
       </div>
@@ -48,6 +48,17 @@
     </div>
 
   </section>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
 
   <form action="/pesquisar-tech" method="get">
     <div class="tituloSearch">
@@ -90,9 +101,9 @@
   </ul>
   <div class="btnSearch">
     <button class="botaoSearch">
-        <a href="/">Voltar à página inicial</a>
+      <a href="/">Voltar à página inicial</a>
     </button>
-</div>
+  </div>
   <script src="../js/script.js"></script>
 </body>
 

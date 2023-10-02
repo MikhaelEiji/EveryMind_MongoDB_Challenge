@@ -34,7 +34,7 @@
             <li><a href="#">Meu Perfil</a></li>
             <li><a href="#">Processos</a></li>
             <li><a href="/todas-vagas">Vagas</a></li>
-            <li><a href="/">Sair</a></li>
+            <li><a href="/logout">Sair</a></li>
           </ul>
         </nav>
       </div>
@@ -54,9 +54,20 @@
   </section>
 
   <div class="saudacao">
-    <h1 class="texto">Ola, <%= everyMind.nome %>!
+    <h1 class="texto">Ola, <%= user.nome %>!
     </h1>
   </div>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
 
   <div class="block-imagem">
     <img src="/img/predio.jpg" class="imagem-banner" alt="Imagem de predios" srcset="" />
@@ -76,7 +87,7 @@
 
 
     <button class="todosTech1">
-      <a href="/inserir-EveryMind">Cadastrar Tech Recruiter</a>
+      <a href="/inserir-techrecruiter">Cadastrar Tech Recruiter</a>
     </button>
   </div>
 

@@ -6,15 +6,17 @@ const multer = require('multer');
 const fs = require("fs");
 const Vaga = require('./models/Vaga');
 const User = require('./models/User'); // Importe o modelo de usuário
-const TechRecruiter = require('./models/TechRecruiter')
-const EveryMind = require('./models/EveryMind')
 const AplicadoVaga = require('./models/Aplicado-Vaga');
 const PDFModel = require('./models/PDFModel');
-
-// const speakeasy = require('speakeasy');
-// const qrcode = require('qrcode');
+const Perguntas = require('./models/Perguntas');
+const PerguntasUser = require('./models/Perguntas-User');
+const passport = require('passport'); // Requer o Passport.js
+const LocalStrategy = require('passport-local').Strategy; // Requer a estratégia Local
+const session = require('express-session'); // Requer express-session
+const flash = require('express-flash');
 
 const app = express()
+app.use(flash());
 
 //
 mongoose.connect('mongodb://localhost/EveryMind', {
@@ -32,6 +34,17 @@ app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 });
 
+function checkAccess(tipo) {
+    return (req, res, next) => {
+        if (req.isAuthenticated() && req.user.tipo === tipo) {
+            // O usuário tem acesso permitido, continue com a próxima rota ou middleware
+            return next();
+        } else {
+            // O usuário não tem acesso permitido, redirecione para uma página de erro ou negue o acesso
+            return res.redirect(ROUTE_LOGIN);
+        }
+    };
+}
 
 // Defina constantes para suas rotas
 const ROUTE_HOME = '/';
@@ -43,14 +56,13 @@ const ROUTE_EXCLUIR_VAGA = '/excluir-vaga/:id';
 const ROUTE_EDITAR_VAGA = '/editar-vaga/:id';
 const ROUTE_EDITAR_STATUS_CANDIDATURA = '/editar-candidaturas/:id';
 const ROUTE_PESQUISAR = '/pesquisar';
-const ROUTE_LOGIN_USUARIO = '/login-usuario';
+const ROUTE_LOGIN = '/login';
+const ROUTE_LOGOUT = '/logout';
 const ROUTE_USUARIO_LOGADO = '/usuario-logado';
 const ROUTE_INSERIR_USUARIO = '/inserir-usuario';
-const ROUTE_LOGIN_TECHRECRUITER = '/login-techrecruiter';
 const ROUTE_TECHRECRUITER_LOGADO = '/techrecruiter-logado';
 const ROUTE_EVERYMIND_LOGADO = '/EveryMind-logado';
 const ROUTE_INSERIR_TECHRECRUITER = '/inserir-techrecruiter';
-const ROUTE_LOGIN_EVERYMIND = '/login-EveryMind';
 const ROUTE_INSERIR_EVERYMIND = '/inserir-EveryMind';
 const ROUTE_TODOS_TECHRECRUITERS = '/todos-techrecruiters';
 const ROUTE_PESQUISAR_TECH = '/pesquisar-tech';
@@ -65,10 +77,71 @@ const ROUTE_CANDIDATURAS = '/candidaturas/:id';
 const ROUTE_CANDIDATURAS_USER = '/candidaturas-user/:id';
 const ROUTE_VISUALIZAR_CURRICULO = '/visualizar-curriculo/:filename';
 const ROUTE_DOWNLOAD_CURRICULO = '/download-curriculo/:filename';
+const ROUTE_FAQ = '/faq';
+const ROUTE_INSERIR_FAQ = '/inserir-faq';
+const ROUTE_INSERIR_PERGUNTA = '/inserir-pergunta'
+const ROUTE_TODAS_PERGUNTAS = '/todas-perguntas';
 
-var user = '';
-var techRecruiter = '';
-var everyMind = '';
+// Configure o middleware de sessão
+app.use(
+    session({
+        secret: 'SecretKey', // Altere isso para uma chave secreta
+        resave: false,
+        saveUninitialized: false,
+    })
+);
+
+// Inicialize o Passport e o middleware de sessão
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Configure o Passport para usar a estratégia Local com o modelo User
+passport.use(
+    new LocalStrategy(
+        {
+            usernameField: 'email',
+            passwordField: 'senha',
+        },
+        async (email, senha, done) => {
+            try {
+                // Encontre o usuário pelo email
+                const user = await User.findOne({ email });
+
+                if (!user) {
+                    // Usuário não encontrado
+                    return done(null, false, { message: 'Usuário/Senha incorretos' });
+                }
+
+                // Verifique a senha usando bcrypt
+                bcrypt.compare(senha, user.senha, (err, res) => {
+                    if (res) {
+                        // Autenticação bem-sucedida, retorne o usuário autenticado
+                        return done(null, user);
+                    } else {
+                        // Senha incorreta
+                        return done(null, false, { message: 'Usuário/Senha incorretos' });
+                    }
+                });
+            } catch (error) {
+                return done(error);
+            }
+        }
+    )
+);
+
+// Serialize e deserialize o usuário para manter o estado da sessão
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id).exec();
+        done(null, user);
+    } catch (error) {
+        done(error);
+    }
+});
 
 function hasSpecialCharacter(senha) {
     const specialCharacters = ['@', '$', '!', '%', '*', '?', '&'];
@@ -79,7 +152,7 @@ app.get(ROUTE_HOME, (req, res) => {
     res.render('home');
 });
 
-app.get(ROUTE_TODAS_VAGAS, async (req, res) => {
+app.get(ROUTE_TODAS_VAGAS, checkAccess('usuario'), async (req, res) => {
     try {
         const area = req.query.area; // Obtenha a área escolhida a partir da consulta
         let vagas;
@@ -97,12 +170,11 @@ app.get(ROUTE_TODAS_VAGAS, async (req, res) => {
     }
 });
 
-app.post(ROUTE_TODAS_VAGAS, async (req, res) => {
-    // const user = await User.findOne(req.params.id);
-    res.render('todas-vagas', { user });
+app.post(ROUTE_TODAS_VAGAS, checkAccess('usuario'), async (req, res) => {
+    res.render('todas-vagas', { user: req.user });
 });
 
-app.get(ROUTE_TODAS_VAGAS_DISPONIVEIS, async (req, res) => {
+app.get(ROUTE_TODAS_VAGAS_DISPONIVEIS, checkAccess('tech'), async (req, res) => {
     try {
         let vagas;
         vagas = await Vaga.find(); // Se nenhuma área for especificada, busque todas as vagas
@@ -114,9 +186,8 @@ app.get(ROUTE_TODAS_VAGAS_DISPONIVEIS, async (req, res) => {
     }
 });
 
-app.post(ROUTE_TODAS_VAGAS_DISPONIVEIS, async (req, res) => {
-    // const user = await User.findOne(req.params.id);
-    res.render('todas-vagas', { user });
+app.post(ROUTE_TODAS_VAGAS_DISPONIVEIS, checkAccess('tech'), async (req, res) => {
+    res.render('todas-vagas', { user: req.user });
 });
 
 app.get(ROUTE_VAGAS, async (req, res) => {
@@ -130,12 +201,13 @@ app.get(ROUTE_VAGAS, async (req, res) => {
 });
 
 
-app.get(ROUTE_INSERIR_VAGA, (req, res) => {
+app.get(ROUTE_INSERIR_VAGA, checkAccess('tech'), (req, res) => {
     res.render('inserir-vaga');
 });
 
-app.post(ROUTE_INSERIR_VAGA, async (req, res) => {
+app.post(ROUTE_INSERIR_VAGA, checkAccess('tech'), async (req, res) => {
     const { titulo, empresa, cargo_de_atuacao, salario, local, descricao } = req.body;
+    techt = req.user.nome
 
     const novaVaga = new Vaga({
         titulo,
@@ -144,6 +216,7 @@ app.post(ROUTE_INSERIR_VAGA, async (req, res) => {
         salario,
         local,
         descricao,
+        tech: techt,
     });
 
     try {
@@ -156,7 +229,7 @@ app.post(ROUTE_INSERIR_VAGA, async (req, res) => {
     }
 });
 
-app.get(ROUTE_EXCLUIR_VAGA, async (req, res) => {
+app.get(ROUTE_EXCLUIR_VAGA, checkAccess('tech'), async (req, res) => {
     try {
         const vaga = await Vaga.findById(req.params.id);
         res.render('excluir-vaga', { vaga });
@@ -166,7 +239,7 @@ app.get(ROUTE_EXCLUIR_VAGA, async (req, res) => {
     }
 });
 
-app.post(ROUTE_EXCLUIR_VAGA, async (req, res) => {
+app.post(ROUTE_EXCLUIR_VAGA, checkAccess('tech'), async (req, res) => {
     try {
         await Vaga.findByIdAndDelete(req.params.id);
 
@@ -178,7 +251,7 @@ app.post(ROUTE_EXCLUIR_VAGA, async (req, res) => {
     }
 });
 
-app.get(ROUTE_EDITAR_VAGA, async (req, res) => {
+app.get(ROUTE_EDITAR_VAGA, checkAccess('tech'), async (req, res) => {
     try {
         const vaga = await Vaga.findById(req.params.id);
         res.render('editar-vaga', { vaga });
@@ -188,7 +261,7 @@ app.get(ROUTE_EDITAR_VAGA, async (req, res) => {
     }
 });
 
-app.post(ROUTE_EDITAR_VAGA, async (req, res) => {
+app.post(ROUTE_EDITAR_VAGA, checkAccess('tech'), async (req, res) => {
     const { titulo, empresa, salario, local, descricao } = req.body;
 
     try {
@@ -208,7 +281,7 @@ app.post(ROUTE_EDITAR_VAGA, async (req, res) => {
     }
 });
 
-app.get(ROUTE_EDITAR_STATUS_CANDIDATURA, async (req, res) => {
+app.get(ROUTE_EDITAR_STATUS_CANDIDATURA, checkAccess('tech'), async (req, res) => {
     try {
         const candidatura = await AplicadoVaga.findById(req.params.id);
         res.render('editar-candidaturas', { candidatura });
@@ -218,7 +291,7 @@ app.get(ROUTE_EDITAR_STATUS_CANDIDATURA, async (req, res) => {
     }
 });
 
-app.post(ROUTE_EDITAR_STATUS_CANDIDATURA, async (req, res) => {
+app.post(ROUTE_EDITAR_STATUS_CANDIDATURA, checkAccess('tech'), async (req, res) => {
     const { vaga, tech, titulo, nome, email, cel, status, pdf } = req.body;
 
     try {
@@ -241,12 +314,11 @@ app.post(ROUTE_EDITAR_STATUS_CANDIDATURA, async (req, res) => {
     }
 });
 
-app.get(ROUTE_PESQUISAR, async (req, res) => {
+app.get(ROUTE_PESQUISAR, checkAccess('usuario'), async (req, res) => {
     const queryCargo = req.query.q_cargo; // Obtenha o valor do campo "Cargo de atuação" da consulta
     const queryLocal = req.query.q_local; // Obtenha o valor do campo "Local" da consulta
     const queryCargo2 = req.query.q_cargo2;
-    let user;
-    user = await User.findOne(req.params.id);
+
 
     try {
         let resultados;
@@ -292,49 +364,28 @@ app.get(ROUTE_PESQUISAR, async (req, res) => {
 });
 
 // Login de usuário
-app.get(ROUTE_LOGIN_USUARIO, (req, res) => {
-    res.render('login-usuario');
+app.get(ROUTE_LOGIN, (req, res) => {
+    res.render('login');
 });
 
-app.post(ROUTE_LOGIN_USUARIO, async (req, res) => {
-    try {
-        const { email, senha } = req.body;
+app.post(ROUTE_LOGIN, passport.authenticate('local', {
+    successRedirect: '/redirect', // Redirecionar para uma rota intermediária
+    failureRedirect: '/login?erro=Usuário/Senha incorretos',
+    failureFlash: true,
+}));
 
-        // Verifique as credenciais do usuário no banco de dados
-        user = await User.findOne({ email }).exec();
-
-        if (!user) {
-            // Usuário não encontrado
-            return res.status(401).redirect('/login-usuario?erro=Usuário/Senha incorretos');
-        }
-
-        // Verifique a senha usando bcrypt
-        const senhaCorreta = await bcrypt.compare(senha, user.senha);
-
-        if (!senhaCorreta) {
-            // Senha incorreta
-            return res.status(401).redirect('/login-usuario?erro=Usuário/Senha incorretos');
-        }
-
-        // if (user.is2FAEnabled) {
-        //     // Verifique o código 2FA
-        //     const isVerified = speakeasy.totp.verify({
-        //         secret: user.secret2FA,
-        //         encoding: 'base32',
-        //         token,
-        //         window: 2, // Permite alguma margem de tempo para códigos expirados
-        //     });
-
-        //     if (!isVerified) {
-        //         return res.status(401).json({ error: 'Código 2FA inválido' });
-        //     }
-        // }
-        // Autenticação bem-sucedida
-        res.render('usuario-logado', { user: user });
-
-    } catch (error) {
-        console.error('Erro no login de usuário:', error);
-        res.status(500).send('Erro no servidor');
+// Rota intermediária para redirecionamento com base no tipo de usuário
+app.get('/redirect', (req, res) => {
+    // Verifique o tipo de usuário e redirecione com base nele
+    const tipo = req.user.tipo;
+    if (tipo === 'usuario') {
+        res.redirect(ROUTE_USUARIO_LOGADO);
+    } else if (tipo === 'tech') {
+        res.redirect(ROUTE_TECHRECRUITER_LOGADO);
+    } else if (tipo === 'everyMind') {
+        res.redirect(ROUTE_EVERYMIND_LOGADO);
+    } else {
+        res.redirect(ROUTE_LOGIN);
     }
 });
 
@@ -347,11 +398,20 @@ app.post(ROUTE_INSERIR_USUARIO, async (req, res) => {
     const { nome, email, senha, raca, genero, pcd, vulnerabilidade } = req.body;
 
     try {
+
+        // Verificar se o usuário já existe com o mesmo e-mail
+        const usuarioExistente = await User.findOne({ email });
+
+        if (usuarioExistente) {
+            // Se o usuário já existir, chame a função para mostrar o pop-up com a mensagem
+            return res.render('inserir-usuario', { mensagem: 'Um usuário com este e-mail já existe.' });
+        }
         // Verifique se o "nome" contém apenas letras (sem números)
         const nomeRegex = /^[A-Za-z]+$/;
 
         if (!nomeRegex.test(nome)) {
-            return res.status(400).send('O "nome" deve conter apenas letras (sem números ou caracteres especiais).');
+            // Se o nome não atender aos requisitos, mostre o pop-up com a mensagem
+            return res.render('inserir-usuario', { mensagem: 'O "nome" deve conter apenas letras (sem números ou caracteres especiais).' });
         }
 
         // Defina a expressão regular para verificar os requisitos
@@ -359,12 +419,12 @@ app.post(ROUTE_INSERIR_USUARIO, async (req, res) => {
 
         // Verifique se a senha atende aos requisitos mínimos
         if (!regex.test(senha)) {
-            return res.status(400).send('A senha não atende aos requisitos mínimos.');
+            return res.render('inserir-usuario', { mensagem: 'A senha não atende aos requisitos mínimos.' });
         }
 
         // Verifique se a senha contém pelo menos um caractere especial
         if (!hasSpecialCharacter(senha)) {
-            return res.status(400).send('A senha deve conter pelo menos um caractere especial.');
+            return res.render('inserir-usuario', { mensagem: 'A senha deve conter pelo menos um caractere especial.'});
         }
 
         // Gere um hash de senha usando o bcrypt
@@ -379,6 +439,7 @@ app.post(ROUTE_INSERIR_USUARIO, async (req, res) => {
             genero,
             pcd,
             vulnerabilidade,
+            tipo: "usuario",
         });
 
         await novoUsuario.save();
@@ -390,78 +451,48 @@ app.post(ROUTE_INSERIR_USUARIO, async (req, res) => {
     }
 });
 
-// Login de Tech Recruiter
-app.get(ROUTE_LOGIN_TECHRECRUITER, (req, res) => {
-    res.render('login-techrecruiter');
-});
-
-app.post(ROUTE_LOGIN_TECHRECRUITER, async (req, res) => {
-    try {
-        const { email, senha } = req.body;
-
-        // Verifique as credenciais do Tech Recruiter no banco de dados
-        techRecruiter = await TechRecruiter.findOne({ email }).exec();
-
-        if (!techRecruiter) {
-            // Tech Recruiter não encontrado
-            res.render('login-techrecruiter')
-            return res.status(401).send('Usuário/Senha incorretos');
-        }
-
-        // Verifique a senha usando bcrypt
-        const senhaCorreta = await bcrypt.compare(senha, techRecruiter.senha);
-
-        if (!senhaCorreta) {
-            // Senha incorreta
-            res.render('login-techrecruiter')
-            return res.status(401).send('Usuário/Senha incorretos');
-        }
-
-        // Autenticação bem-sucedida
-        res.render('techrecruiter-logado', { techRecruiter });
-
-    } catch (error) {
-        console.error('Erro no login de Tech Recruiter:', error);
-        res.status(500).send('Erro no servidor');
-    }
+// Rota para Voltar
+app.get(ROUTE_USUARIO_LOGADO, checkAccess('usuario'), (req, res) => {
+    res.render('usuario-logado', { user: req.user });
 });
 
 // Rota para Voltar
-app.get(ROUTE_USUARIO_LOGADO, (req, res) => {
-    res.render('usuario-logado', { user });
+app.post(ROUTE_USUARIO_LOGADO, checkAccess('usuario'), async (req, res) => {
+    res.render('usuario-logado', { user: req.user });
 });
 
 // Rota para Voltar
-app.post(ROUTE_USUARIO_LOGADO, async (req, res) => {
-    // const user = await User.findOne(req.params.id);
-    console.log(user)
-    res.render('usuario-logado', { user });
+app.get(ROUTE_TECHRECRUITER_LOGADO, checkAccess('tech'), (req, res) => {
+    res.render('techrecruiter-logado', { user: req.user });
 });
 
 // Rota para Voltar
-app.get(ROUTE_TECHRECRUITER_LOGADO, (req, res) => {
-    res.render('techrecruiter-logado', { techRecruiter });
-});
-
-// Rota para Voltar
-app.get(ROUTE_EVERYMIND_LOGADO, (req, res) => {
-    res.render('EveryMind-logado', { everyMind });
+app.get(ROUTE_EVERYMIND_LOGADO, checkAccess('everyMind'), (req, res) => {
+    res.render('EveryMind-logado', { user: req.user });
 });
 
 // Rota para inserção de Tech Recruiter
-app.get(ROUTE_INSERIR_TECHRECRUITER, (req, res) => {
+app.get(ROUTE_INSERIR_TECHRECRUITER, checkAccess('everyMind'), (req, res) => {
     res.render('inserir-techrecruiter');
 });
 
-app.post(ROUTE_INSERIR_TECHRECRUITER, async (req, res) => {
+app.post(ROUTE_INSERIR_TECHRECRUITER, checkAccess('everyMind'), async (req, res) => {
     const { nome, email, senha } = req.body;
 
     try {
+        // Verificar se o usuário já existe com o mesmo e-mail
+        const usuarioExistente = await User.findOne({ email });
+
+        if (usuarioExistente) {
+            // Se o usuário já existir, chame a função para mostrar o pop-up com a mensagem
+            return res.render('inserir-techrecruiter', { mensagem: 'Um tech recruiter com este e-mail já existe.' });
+        }
+
         // Verifique se o "nome" contém apenas letras (sem números)
         const nomeRegex = /^[A-Za-z]+$/;
 
         if (!nomeRegex.test(nome)) {
-            return res.status(400).send('O "nome" deve conter apenas letras (sem números ou caracteres especiais).');
+            return res.render('inserir-techrecruiter', { mensagem: 'O "nome" deve conter apenas letras (sem números ou caracteres especiais).'});
         }
 
         // Defina a expressão regular para verificar os requisitos
@@ -469,25 +500,26 @@ app.post(ROUTE_INSERIR_TECHRECRUITER, async (req, res) => {
 
         // Verifique se a senha atende aos requisitos mínimos
         if (!regex.test(senha)) {
-            return res.status(400).send('A senha não atende aos requisitos mínimos.');
+            return res.render('inserir-techrecruiter', { mensagem: 'A senha não atende aos requisitos mínimos.'});
         }
 
         // Verifique se a senha contém pelo menos um caractere especial
         if (!hasSpecialCharacter(senha)) {
-            return res.status(400).send('A senha deve conter pelo menos um caractere especial.');
+            return res.render('inserir-techrecruiter', { mensagem: 'A senha deve conter pelo menos um caractere especial.'});
         }
 
         // Gere um hash de senha usando o bcrypt
         const hashedSenha = await bcrypt.hash(senha, 10);
 
         // Crie um novo Tech Recruiter com a senha criptografada
-        const novoTechRecruiter = new TechRecruiter({
+        const novoUsuario = new User({
             nome,
             email,
             senha: hashedSenha,
+            tipo: "tech",
         });
 
-        await novoTechRecruiter.save();
+        await novoUsuario.save();
         console.log('Tech Recruiter inserido no MongoDB');
         res.redirect('EveryMind-logado');
     } catch (error) {
@@ -496,54 +528,27 @@ app.post(ROUTE_INSERIR_TECHRECRUITER, async (req, res) => {
     }
 });
 
-app.get(ROUTE_LOGIN_EVERYMIND, (req, res) => {
-    res.render('login-EveryMind'); // Renderize a página de login do usuário
-});
-
-app.post(ROUTE_LOGIN_EVERYMIND, async (req, res) => {
-    try {
-        const { email, senha } = req.body;
-
-        // Verifique as credenciais do usuário no banco de dados
-        everyMind = await EveryMind.findOne({ email }).exec();
-
-        if (!everyMind) {
-            // Usuário não encontrado
-            //res.render('login-EveryMind')
-            return res.status(401).send('Usuário/Senha incorretos');
-        }
-
-        // Verifique a senha usando bcrypt
-        const senhaCorreta = await bcrypt.compare(senha, everyMind.senha);
-
-        if (!senhaCorreta) {
-            // Senha incorreta
-            //res.render('login-EveryMind')
-            return res.status(401).send('Usuário/Senha incorretos');
-        }
-
-        // Autenticação bem-sucedida
-        res.render('EveryMind-logado', { everyMind });
-
-    } catch (error) {
-        console.error('Erro no login de EveryMind:', error);
-        res.status(500).send('Erro no servidor');
-    }
-});
-
-app.get(ROUTE_INSERIR_EVERYMIND, (req, res) => {
+app.get(ROUTE_INSERIR_EVERYMIND, checkAccess('everyMind'), (req, res) => {
     res.render('inserir-EveryMind');
 });
 
-app.post(ROUTE_INSERIR_EVERYMIND, async (req, res) => {
+app.post(ROUTE_INSERIR_EVERYMIND, checkAccess('everyMind'), async (req, res) => {
     const { nome, email, senha } = req.body;
 
     try {
+        // Verificar se o usuário já existe com o mesmo e-mail
+        const usuarioExistente = await User.findOne({ email });
+
+        if (usuarioExistente) {
+            // Se o usuário já existir, chame a função para mostrar o pop-up com a mensagem
+            return res.render('inserir-EveryMind', { mensagem: 'Um administrador com este e-mail já existe.' });
+        }
+
         // Verifique se o "nome" contém apenas letras (sem números)
         const nomeRegex = /^[A-Za-z]+$/;
 
         if (!nomeRegex.test(nome)) {
-            return res.status(400).send('O "nome" deve conter apenas letras (sem números ou caracteres especiais).');
+            return res.render('inserir-EveryMind', { mensagem: 'O "nome" deve conter apenas letras (sem números ou caracteres especiais).'});
         }
 
         // Defina a expressão regular para verificar os requisitos
@@ -551,25 +556,26 @@ app.post(ROUTE_INSERIR_EVERYMIND, async (req, res) => {
 
         // Verifique se a senha atende aos requisitos mínimos
         if (!regex.test(senha)) {
-            return res.status(400).send('A senha não atende aos requisitos mínimos.');
+            return res.render('inserir-EveryMind', { mensagem: 'A senha não atende aos requisitos mínimos.'});
         }
 
         // Verifique se a senha contém pelo menos um caractere especial
         if (!hasSpecialCharacter(senha)) {
-            return res.status(400).send('A senha deve conter pelo menos um caractere especial.');
+            return res.render('inserir-EveryMind', { mensagem: 'A senha deve conter pelo menos um caractere especial.'});
         }
 
         // Gere um hash de senha usando o bcrypt
         const hashedSenha = await bcrypt.hash(senha, 10); // O número 10 é o custo de processamento, você pode ajustá-lo
 
         // Crie um novo usuário com a senha criptografada
-        const novoEveryMind = new EveryMind({
+        const novoUsuario = new User({
             nome,
             email,
             senha: hashedSenha, // Armazene o hash da senha no banco de dados
+            tipo: "everyMind",
         });
 
-        await novoEveryMind.save();
+        await novoUsuario.save();
         console.log('Administrador inserido no MongoDB');
         res.redirect('EveryMind-logado');
     } catch (error) {
@@ -578,10 +584,9 @@ app.post(ROUTE_INSERIR_EVERYMIND, async (req, res) => {
     }
 });
 
-app.get(ROUTE_TODOS_TECHRECRUITERS, async (req, res) => {
+app.get(ROUTE_TODOS_TECHRECRUITERS, checkAccess('everyMind'), async (req, res) => {
     try {
-        let techrecruiters;
-        techrecruiters = await TechRecruiter.find(); // Se nenhuma área for especificada, busque todas as vagas
+        const techrecruiters = await User.find({ tipo: 'tech' });
 
         res.render('todos-techrecruiters', { techrecruiters });
     } catch (error) {
@@ -590,7 +595,7 @@ app.get(ROUTE_TODOS_TECHRECRUITERS, async (req, res) => {
     }
 });
 
-app.get(ROUTE_PESQUISAR_TECH, async (req, res) => {
+app.get(ROUTE_PESQUISAR_TECH, checkAccess('tech'), async (req, res) => {
     const queryCargo = req.query.q_cargo; // Obtenha o valor do campo "Cargo de atuação" da consulta
     const queryLocal = req.query.q_local; // Obtenha o valor do campo "Local" da consulta
 
@@ -632,18 +637,18 @@ app.get(ROUTE_PESQUISAR_TECH, async (req, res) => {
 });
 
 // Rota para a página de perfil
-app.get(ROUTE_PERFIL_USUARIO, (req, res) => {
+app.get(ROUTE_PERFIL_USUARIO, checkAccess('usuario'), (req, res) => {
     const user = req.user; // Supondo que você tenha autenticado o usuário
     if (!user) {
         // Redirecione para a página de login ou exiba uma mensagem de erro
-        return res.redirect(ROUTE_LOGIN_USUARIO);
+        return res.redirect(ROUTE_LOGIN);
     }
 
     // Renderize a página de perfil e passe o usuário como contexto
     res.render('perfil-usuario', { user });
 });
 
-app.get(ROUTE_APLICAR_VAGA, async (req, res) => {
+app.get(ROUTE_APLICAR_VAGA, checkAccess('usuario'), async (req, res) => {
     try {
         const vaga = await Vaga.findById(req.params.id);
         res.render('aplicar-vaga', { vaga });
@@ -666,16 +671,15 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 
-app.post(ROUTE_APLICAR_VAGA, upload.single('pdfFile'), async (req, res) => {
+app.post(ROUTE_APLICAR_VAGA, checkAccess('usuario'), upload.single('pdfFile'), async (req, res) => {
     try {
-        // user = await User.findOne(req.params.id);
         // Recupere os dados do formulário
         const vagaId = req.params.id;
-        nome = user.nome;
-        email = user.email;
-        raca = user.raca;
-        genero = user.genero;
-        vulnerabilidade = user.vulnerabilidade;
+        nome = req.user.nome;
+        email = req.user.email;
+        raca = req.user.raca;
+        genero = req.user.genero;
+        vulnerabilidade = req.user.vulnerabilidade;
         const { cel } = req.body;
 
         // Verifique se a vaga com o ID fornecido existe
@@ -740,32 +744,20 @@ app.post(ROUTE_APLICAR_VAGA, upload.single('pdfFile'), async (req, res) => {
     }
 });
 
-app.get(ROUTE_TODAS_CANDIDATURAS, async (req, res) => {
+app.get(ROUTE_TODAS_CANDIDATURAS, checkAccess('tech'), async (req, res) => {
     try {
-        // Certifique-se de que o Tech Recruiter está autenticado e você tem acesso às informações dele.
-        // if (!req.techRecruiter) {
-        //     return res.redirect(ROUTE_LOGIN_TECHRECRUITER); // Redireciona para a página de login se o Tech Recruiter não estiver autenticado ou não tiver a função correta.
-        // }
-
-        // const techRecruiterUser = req.techRecruiter.nome; // Supondo que o ID do Tech Recruiter esteja disponível no objeto de usuário.
-        const tech = techRecruiter.nome
-        // console.log(tech);
+        const tech = req.user.nome
         // Busque todas as candidaturas relacionadas ao Tech Recruiter logado com base no ID dele.
         const candidaturas = await AplicadoVaga.find({ tech });
         // console.log(candidaturas)
         res.render('todas-candidaturas', { candidaturas });
-
-        // let candidaturas;
-        // candidaturas = await AplicadoVaga.find(); // Se nenhuma área for especificada, busque todas as vagas
-
-        // res.render('todas-candidaturas', { candidaturas });
     } catch (error) {
         console.error('Erro ao buscar vagas:', error);
         res.redirect(ROUTE_TECHRECRUITER_LOGADO); // Você pode redirecionar para a página inicial em caso de erro
     }
 });
 
-app.get(ROUTE_TODAS_CANDIDATURAS_ADMIN, async (req, res) => {
+app.get(ROUTE_TODAS_CANDIDATURAS_ADMIN, checkAccess('everyMind'), async (req, res) => {
     try {
         let candidaturas;
         candidaturas = await AplicadoVaga.find(); // Se nenhuma área for especificada, busque todas as vagas
@@ -776,38 +768,27 @@ app.get(ROUTE_TODAS_CANDIDATURAS_ADMIN, async (req, res) => {
     }
 });
 
-app.get(ROUTE_VAGAS_APLICADAS_USUARIO, async (req, res) => {
+app.get(ROUTE_VAGAS_APLICADAS_USUARIO, checkAccess('usuario'), async (req, res) => {
     try {
-        // Certifique-se de que o Tech Recruiter está autenticado e você tem acesso às informações dele.
-        // if (!req.techRecruiter) {
-        //     return res.redirect(ROUTE_LOGIN_TECHRECRUITER); // Redireciona para a página de login se o Tech Recruiter não estiver autenticado ou não tiver a função correta.
-        // }
-
-        // const techRecruiterUser = req.techRecruiter.nome; // Supondo que o ID do Tech Recruiter esteja disponível no objeto de usuário.
-        const email = user.email
+        const email = req.user.email
         // Busque todas as candidaturas relacionadas ao Tech Recruiter logado com base no ID dele.
         const candidaturas = await AplicadoVaga.find({ email });
         // console.log(candidaturas)
         res.render('vagas-aplicadas-usuario', { candidaturas });
-
-        // let candidaturas;
-        // candidaturas = await AplicadoVaga.find(); // Se nenhuma área for especificada, busque todas as vagas
-
-        // res.render('todas-candidaturas', { candidaturas });
     } catch (error) {
         console.error('Erro ao buscar vagas:', error);
         res.redirect(ROUTE_USUARIO_LOGADO); // Você pode redirecionar para a página inicial em caso de erro
     }
 });
 
-app.get(ROUTE_PESQUISAR_CANDIDATURA, async (req, res) => {
+app.get(ROUTE_PESQUISAR_CANDIDATURA, checkAccess('tech'), async (req, res) => {
     const queryNome = req.query.q_nome; // Obtenha o valor do campo "Nome" da consulta
     const queryEmail = req.query.q_email; // Obtenha o valor do campo "Email" da consulta
 
     try {
         let resultados;
         let query = "";
-        tech = techRecruiter.nome // Certifique-se de definir a variável 'tech'
+        tech = req.user.nome // Certifique-se de definir a variável 'tech'
 
         if (queryNome && queryEmail) {
             // Se ambos os campos de pesquisa estão preenchidos, filtre com base em ambos
@@ -845,7 +826,7 @@ app.get(ROUTE_PESQUISAR_CANDIDATURA, async (req, res) => {
     }
 });
 
-app.get(ROUTE_PESQUISAR_CANDIDATURA_ADMIN, async (req, res) => {
+app.get(ROUTE_PESQUISAR_CANDIDATURA_ADMIN, checkAccess('everyMind'), async (req, res) => {
     const queryNome = req.query.q_nome; // Obtenha o valor do campo "Nome" da consulta
     const queryEmail = req.query.q_email; // Obtenha o valor do campo "Email" da consulta
 
@@ -900,7 +881,7 @@ app.get(ROUTE_CANDIDATURAS, async (req, res) => {
     }
 });
 
-app.get(ROUTE_CANDIDATURAS_USER, async (req, res) => {
+app.get(ROUTE_CANDIDATURAS_USER, checkAccess('usuario'), async (req, res) => {
     try {
         const candidatura = await AplicadoVaga.findById(req.params.id);
         if (!candidatura) {
@@ -962,57 +943,91 @@ app.get(ROUTE_DOWNLOAD_CURRICULO, async (req, res) => {
     }
 });
 
+app.get(ROUTE_FAQ, async (req, res) => {
+    try {
+        let perguntas;
+        perguntas = await Perguntas.find(); // Se nenhuma área for especificada, busque todas as vagas
 
-// app.post('/ativar-2fa', async (req, res) => {
-//     const userId = req.user.id; // Você deve ter uma maneira de identificar o usuário logado
+        res.render('faq', { perguntas });
+    } catch (error) {
+        console.error('Erro ao buscar vagas:', error);
+        res.redirect(ROUTE_HOME); // Você pode redirecionar para a página inicial em caso de erro
+    }
+});
 
-//     try {
-//         // Gere uma chave secreta 2FA única para o usuário
-//         const secret = speakeasy.generateSecret({ length: 20 });
+app.post(ROUTE_FAQ, async (req, res) => {
+    res.render('faq');
+});
 
-//         // Salve a chave secreta no modelo de usuário
-//         const user = await User.findById(userId);
-//         user.secret2FA = secret.base32;
-//         user.is2FAEnabled = true; // Marque o 2FA como ativado
-//         await user.save();
+app.get(ROUTE_INSERIR_FAQ, checkAccess('tech'), (req, res) => {
+    res.render('inserir-faq');
+});
 
-//         // Envie a chave secreta ao cliente (para geração de código de backup, se necessário)
-//         res.json({ secret: secret.base32 });
-//     } catch (error) {
-//         console.error('Erro ao ativar o 2FA:', error);
-//         res.status(500).json({ error: 'Erro no servidor' });
-//     }
-// });
+app.post(ROUTE_INSERIR_FAQ, checkAccess('tech'), async (req, res) => {
+    const { topico, resposta } = req.body;
 
-// app.get('/exibir-qr', (req, res) => {
-//     const userId = req.user.id; // Você deve ter uma maneira de identificar o usuário logado
+    const novoTopico = new Perguntas({
+        topico,
+        resposta,
+    });
 
-//     // Recupere a chave secreta do usuário
-//     User.findById(userId)
-//         .then((user) => {
-//             if (!user || !user.secret2FA) {
-//                 return res.status(404).json({ error: '2FA não ativado para este usuário' });
-//             }
+    try {
+        await novoTopico.save();
+        console.log('Topico inserida no MongoDB');
+        res.redirect(ROUTE_TECHRECRUITER_LOGADO);
+    } catch (error) {
+        console.error('Erro ao inserir topico:', error);
+        res.redirect(ROUTE_INSERIR_FAQ); // Redirecionar de volta ao formulário em caso de erro
+    }
+});
 
-//             // Gere o código QR
-//             const otpauthUrl = speakeasy.otpauthURL({
-//                 secret: user.secret2FA,
-//                 label: 'Nome do Seu Aplicativo',
-//                 issuer: 'Sua Empresa',
-//             });
+app.get(ROUTE_INSERIR_PERGUNTA, checkAccess('usuario'), (req, res) => {
+    res.render('inserir-pergunta');
+});
 
-//             qrcode.toDataURL(otpauthUrl, (err, imageUrl) => {
-//                 if (err) {
-//                     console.error('Erro ao gerar o código QR:', err);
-//                     res.status(500).json({ error: 'Erro ao gerar o código QR' });
-//                 } else {
-//                     // Exiba a imagem do código QR para o usuário
-//                     res.send(`<img src="${imageUrl}" alt="Código QR">`);
-//                 }
-//             });
-//         })
-//         .catch((error) => {
-//             console.error('Erro ao buscar usuário:', error);
-//             res.status(500).json({ error: 'Erro no servidor' });
-//         });
-// });
+app.post(ROUTE_INSERIR_PERGUNTA, async (req, res) => {
+    const { pergunta } = req.body;
+
+    const novoPerguntaUser = new PerguntasUser({
+        pergunta,
+
+    });
+
+    try {
+        await novoPerguntaUser.save();
+        console.log('Pergunta inserida no MongoDB');
+        res.redirect(ROUTE_USUARIO_LOGADO);
+    } catch (error) {
+        console.error('Erro ao inserir pergunta:', error);
+        res.redirect(ROUTE_INSERIR_PERGUNTA); // Redirecionar de volta ao formulário em caso de erro
+    }
+});
+
+app.get(ROUTE_TODAS_PERGUNTAS, checkAccess('tech'), async (req, res) => {
+    try {
+        let perguntas;
+
+        perguntas = await PerguntasUser.find(); // Se nenhuma área for especificada, busque todas as vagas
+
+
+        res.render('todas-perguntas', { perguntas });
+    } catch (error) {
+        console.error('Erro ao buscar vagas:', error);
+        res.redirect(ROUTE_USUARIO_LOGADO); // Você pode redirecionar para a página inicial em caso de erro
+    }
+});
+
+app.post(ROUTE_TODAS_PERGUNTAS, checkAccess('tech'), async (req, res) => {
+    res.render('todas-vagas', { user: req.user });
+});
+
+app.get(ROUTE_LOGOUT, (req, res) => {
+    req.logout(function (err) {
+        if (err) {
+            // Handle any errors that occur during logout
+            return next(err);
+        }
+        // Redirect the user to a different page after logout
+        res.redirect(ROUTE_LOGIN);
+    });
+});

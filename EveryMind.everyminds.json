@@ -1,9 +1,0 @@
-[{
-  "_id": {
-    "$oid": "650a57089bc48ecd4a0fffc1"
-  },
-  "username": "Admin",
-  "email": "admin",
-  "senha": "$2b$10$S7nt7XThzMKYs0QNFhwqaeL/FQWG6/Vrd.EX7.CzG13iq5RsrKB.2",
-  "__v": 0
-}]

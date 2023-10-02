@@ -36,7 +36,7 @@
                         <li><a href="#">Meu Perfil</a></li>
                         <li><a href="#">Processos</a></li>
                         <li><a href="/todas-vagas">Vagas</a></li>
-                        <li><a href="/">Sair</a></li>
+                        <li><a href="/logout">Sair</a></li>
                     </ul>
                 </nav>
             </div>
@@ -50,6 +50,18 @@
         </div>
 
     </section>
+
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
     <h1 class="vagas-inserir texto">Inserir Novo Usuario</h1>
     <form action="/inserir-usuario" method="post" class="form-vaga">
         <label for="nome">Nome:</label>
@@ -59,8 +71,12 @@
             Números não são permitidos no "nome".
         </div>
         <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required class="input-vagas">
+        <input type="email" id="email" name="email" required class="input-vagas" onblur="verificarEmail()">
         <br>
+        <!-- Adicione um elemento para mostrar a mensagem de erro -->
+        <div id="mensagem-erro" class="invalid" style="display: none;">
+            <p>O e-mail já está em uso. Escolha outro e-mail.</p>
+        </div>
         <div id="email-warning" class="invalid" style="display: none;">
             O endereço de email deve conter "@" (por exemplo, "seuemail@dominio.com").
         </div>

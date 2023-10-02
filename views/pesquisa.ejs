@@ -34,7 +34,7 @@
             <li><a href="#">Meu Perfil</a></li>
             <li><a href="/vagas-aplicadas-usuario">Processos</a></li>
             <li><a href="/todas-vagas">Vagas</a></li>
-            <li><a href="/">Sair</a></li>
+            <li><a href="/logout">Sair</a></li>
           </ul>
         </nav>
       </div>
@@ -49,22 +49,34 @@
 
   </section>
 
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
+
   <form action="/pesquisar" method="get">
-    <div class="tituloSearch texto" >
+    <div class="tituloSearch texto">
       <p>Encontre as melhores vagas para você!</p>
-  </div>
-  <div class="inputsSearch-vagas">
-      <input type="text" placeholder="Cargo de atuacao" name="q_cargo" class="input-form-vaga"> <!-- Adicione name="q_cargo" -->
-      <input type="text" placeholder="Local" name="q_local" class="input-form-vaga">  <!-- Adicione name="q_local" -->
-  </div>
-  <div class="btnSearch">
+    </div>
+    <div class="inputsSearch-vagas">
+      <input type="text" placeholder="Cargo de atuacao" name="q_cargo" class="input-form-vaga">
+      <!-- Adicione name="q_cargo" -->
+      <input type="text" placeholder="Local" name="q_local" class="input-form-vaga"> <!-- Adicione name="q_local" -->
+    </div>
+    <div class="btnSearch">
       <button class="botaoSearch">Buscar Vagas</button>
-  </div>
-  <div class="btnSearch">
+    </div>
+    <div class="btnSearch">
       <button class="botaoSearch">
-          <a href="/usuario-logado">Voltar</a>
+        <a href="/usuario-logado">Voltar</a>
       </button>
-  </div>
+    </div>
 
   </form>
   <h1 class="qntVagas texto">Vagas Disponíveis: (<span id="quantidadeVagas">
@@ -96,9 +108,9 @@
   </ul>
   <div class="btnSearch">
     <button class="botaoSearch">
-        <a href="/">Voltar à página inicial</a>
+      <a href="/">Voltar à página inicial</a>
     </button>
-</div>
+  </div>
   <script src="../js/script.js"></script>
 </body>
 

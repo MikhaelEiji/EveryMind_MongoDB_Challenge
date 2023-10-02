@@ -34,7 +34,7 @@
                         <li><a href="#">Meu Perfil</a></li>
                         <li><a href="#">Processos</a></li>
                         <li><a href="/todas-vagas">Vagas</a></li>
-                        <li><a href="/">Sair</a></li>
+                        <li><a href="/logout">Sair</a></li>
                     </ul>
                 </nav>
             </div>
@@ -49,16 +49,29 @@
 
     </section>
 
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
     <h1 class="texto">Editar Vaga</h1>
     <form action="/editar-candidaturas/<%= candidatura._id %>" method="post">
         <label for="status" class="texto2">Status:</label>
         <!-- <input type="text" id="status" name="status" value="<%= candidatura.status %>" required class="input-form1"> -->
         <select id="status" name="status" required class="input-form1">
             <option value="Aplicado">Aplicado</option>
+            <option value="Reprovado">Reprovado</option>
             <option value="Selecionado">Selecionado para teste</option>
             <option value="Testes">Testes</option>
             <option value="Entrevista">Entrevista</option>
             <option value="Aprovado">Aprovado</option>
+            <option value="Finalizada">Finalizada</option>
         </select>
         <br>
         <div class="btnSearch">

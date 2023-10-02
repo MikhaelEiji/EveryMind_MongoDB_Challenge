@@ -846,6 +846,13 @@ footer {
     color: #333 !important;
 }
 
+.invalid {
+    color: red;
+}
+
+.valid {
+    color: green;
+}
 
 @media only screen and (max-width: 600px) {
     .block-header {

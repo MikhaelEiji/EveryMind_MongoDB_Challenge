@@ -31,9 +31,10 @@
         </div>
         <nav class="nav" id="nav">
           <ul>
-            <li><a href="/login-usuario">Meu Perfil</a></li>
-            <li><a href="/login-usuario">Processos</a></li>
-            <li><a href="/login-usuario">Vagas</a></li>
+            <li><a href="/login">Meu Perfil</a></li>
+            <li><a href="/login">Processos</a></li>
+            <li><a href="/login">Vagas</a></li>
+            <li><a href="/faq">FAQ</a></li>
             <li><a href="/">Sair</a></li>
           </ul>
         </nav>
@@ -42,10 +43,10 @@
       <div class="menu-bg" id="menu-bg"></div>
 
       <div class="botao-header">
-        <p><a href="/login-EveryMind">Sou EveryMind</a></p>
+        <p><a href="/login">Sou EveryMind</a></p>
       </div>
       <div class="botao-header">
-        <p><a href="/login-techrecruiter">Sou Tech Recruiter</a></p>
+        <p><a href="/login">Sou Tech Recruiter</a></p>
       </div>
     </div>
 
@@ -54,9 +55,20 @@
     </div>
 
     <div class="block-header">
-      <button type="button" class="login-button"><a href="/login-usuario">Login</a></button>
+      <button type="button" class="login-button"><a href="/login">Login</a></button>
     </div>
   </section>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
 
   <div class="block-imagem">
     <img src="/img/img-header.png" class="imagem-banner"
@@ -77,7 +89,7 @@
     <div class="busca">
       <input type="text" id="txtBusca" placeholder="Qual vaga você procura?" />
       <!-- <img class="lupa" src="../images/icone-loupe-noir 1.svg" id="btnBusca" alt="Buscar" /> -->
-      <button class="btnPesquisa"><a href="/login-usuario">Pesquisar Vagas</a></button>
+      <button class="btnPesquisa"><a href="/login">Pesquisar Vagas</a></button>
     </div>
   </div>
 
@@ -88,45 +100,63 @@
     <div class="block-vagas">
       <div class="vagas">
         <img src="/img/7067450_briefcase_bag_alternatif_icon 1.svg" alt="" />
-        <a href="/login-usuario"><p>Negócios</p></a>
+        <a href="/login">
+          <p>Negócios</p>
+        </a>
       </div>
       <div class="vagas">
         <img src="/img/2633204_circuit_digital_tech_technology_icon 1.svg" alt="" />
-        <a href="/login-usuario"><p>Tecnologia</p></a>
+        <a href="/login">
+          <p>Tecnologia</p>
+        </a>
       </div>
       <div class="vagas">
         <img src="/img/4213476_apartment_architecture_building_city_company_icon 1.svg" alt="" />
-        <a href="/login-usuario"><p>Administração</p></a>
+        <a href="/login">
+          <p>Administração</p>
+        </a>
       </div>
     </div>
 
     <div class="block-vagas">
       <div class="vagas">
         <img src="/img/290143_cash_money_payment_wallet_icon 1.svg" alt="" />
-        <a href="/login-usuario"><p>Vendas</p></a>
+        <a href="/login">
+          <p>Vendas</p>
+        </a>
       </div>
       <div class="vagas">
         <img src="/img/7830542_human_resources_search_employees_icon 1.svg" alt="" />
-        <a href="/login-usuario"><p>RH</p></a>
+        <a href="/login">
+          <p>RH</p>
+        </a>
       </div>
       <div class="vagas">
         <img src="/img/753891_lawyer_judge_justice_law_legal_icon 1.svg" alt="" />
-        <a href="/login-usuario"><p>Jurídico</p></a>
+        <a href="/login">
+          <p>Jurídico</p>
+        </a>
       </div>
     </div>
 
     <div class="block-vagas">
       <div class="vagas">
         <img src="/img/7898409_promotion_business_finance_office_marketing_icon 1.svg" alt="" />
-        <a href="/login-usuario"><p>Marketing</p></a>
+        <a href="/login">
+          <p>Marketing</p>
+        </a>
       </div>
       <div class="vagas">
         <img src="/img/172507_box_money_icon 1.svg" alt="" />
-        <a href="/login-usuario"><p>Financeiro</p></a>
+        <a href="/login">
+          <p>Financeiro</p>
+        </a>
       </div>
       <div class="vagas">
         <img src="/img/9040420_heart_pulse_icon 1.svg" alt="" />
-        <a href="/login-usuario"><p>Saúde</p></a>
+        <a href="/login">
+          <p>Saúde</p>
+        </a>
       </div>
     </div>
 

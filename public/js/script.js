@@ -160,3 +160,33 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+
+// Obtém referências para o elemento de mensagem de erro
+const mensagemErro = document.getElementById('mensagem-erro');
+
+// Função para mostrar a mensagem de erro
+function mostrarErro() {
+  mensagemErro.style.display = 'block';
+}
+
+// Função para ocultar a mensagem de erro
+function ocultarErro() {
+  mensagemErro.style.display = 'none';
+}
+
+// Adicione esta função para verificar se o e-mail já existe
+function verificarEmail() {
+  const email = document.getElementById('email').value; // Substitua 'email' pelo ID do campo de e-mail
+
+  // Verifique se o campo de e-mail já está preenchido
+  if (email) {
+    // Você pode mostrar a mensagem de erro aqui se o campo de e-mail já estiver preenchido
+    mostrarErro();
+  } else {
+    // Se o campo de e-mail estiver vazio, oculte a mensagem de erro
+    ocultarErro();
+
+    // Continuar com a verificação de e-mail no servidor
+    // ...
+  }
+}

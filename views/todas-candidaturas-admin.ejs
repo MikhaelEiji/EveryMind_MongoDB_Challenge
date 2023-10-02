@@ -35,7 +35,7 @@
                         <li><a href="#">Meu Perfil</a></li>
                         <li><a href="#">Processos</a></li>
                         <li><a href="/todas-vagas-disponiveis">Vagas</a></li>
-                        <li><a href="/">Sair</a></li>
+                        <li><a href="/logout">Sair</a></li>
                     </ul>
                 </nav>
             </div>
@@ -49,6 +49,17 @@
         </div>
 
     </section>
+
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
 
     <form action="/pesquisar-candidatura-admin" method="get">
         <div class="tituloSearch">
@@ -65,7 +76,7 @@
 
     <h1 class="qntVagas">Candidaturas: (<span id="quantidadeVagas">
             <%= candidaturas.length %>
-        </span>)</h1>    
+        </span>)</h1>
     <table style="width:80%; margin: auto;" class="bordered striped centered responsive-table">
         <thead>
             <tr>
@@ -74,28 +85,46 @@
                 <th>Nome</th>
                 <th>Email</th>
                 <th>Celular</th>
-                <th>Tech</th>
                 <th>Raça</th>
                 <th>Genêro</th>
                 <th>Vulnerabilidade</th>
+                <th>Tech</th>
                 <th>Ação</th>
             </tr>
         </thead>
         <tbody>
             <% candidaturas.forEach(function(candidatura) { %>
                 <tr>
-                    <td><%= candidatura.vaga %></td>
-                    <td><%= candidatura.titulo %></td>
-                    <td><%= candidatura.nome %></td>
-                    <td><%= candidatura.email %></td>
-                    <td><%= candidatura.cel %></td>
-                    <td><%= candidatura.raca %></td>
-                    <td><%= candidatura.genero %></td>
-                    <td><%= candidatura.vulnerabilidade %></td>
-                    <td><%= candidatura.tech %></td>
+                    <td>
+                        <%= candidatura.vaga %>
+                    </td>
+                    <td>
+                        <%= candidatura.titulo %>
+                    </td>
+                    <td>
+                        <%= candidatura.nome %>
+                    </td>
+                    <td>
+                        <%= candidatura.email %>
+                    </td>
+                    <td>
+                        <%= candidatura.cel %>
+                    </td>
+                    <td>
+                        <%= candidatura.raca %>
+                    </td>
+                    <td>
+                        <%= candidatura.genero %>
+                    </td>
+                    <td>
+                        <%= candidatura.vulnerabilidade %>
+                    </td>
+                    <td>
+                        <%= candidatura.tech %>
+                    </td>
                     <td><button><a href="/candidaturas/<%= candidatura._id %>">Ver Candidatura</a></button></td>
                 </tr>
-            <% }); %>
+                <% }); %>
         </tbody>
     </table>
 

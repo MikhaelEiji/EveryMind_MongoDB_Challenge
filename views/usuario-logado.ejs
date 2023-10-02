@@ -34,7 +34,8 @@
             <li><a href="#">Meu Perfil</a></li>
             <li><a href="/vagas-aplicadas-usuario">Processos</a></li>
             <li><a href="/todas-vagas">Vagas</a></li>
-            <li><a href="/">Sair</a></li>
+            <li><a href="/inserir-pergunta">Duvidas</a></li>
+            <li><a href="/logout">Sair</a></li>
           </ul>
         </nav>
       </div>
@@ -54,6 +55,17 @@
       </a>
     </div>
   </section>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget('https://vlibras.gov.br/app');
+  </script>
 
   <div class="saudacao">
     <h1 class="texto">Ola, <%= user.nome %>!

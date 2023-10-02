@@ -34,7 +34,7 @@
                         <li><a href="#">Meu Perfil</a></li>
                         <li><a href="#">Processos</a></li>
                         <li><a href="/todas-vagas">Vagas</a></li>
-                        <li><a href="/">Sair</a></li>
+                        <li><a href="/logout">Sair</a></li>
                     </ul>
                 </nav>
             </div>
@@ -49,26 +49,37 @@
 
     </section>
 
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+
     <!-- View da Página de Perfil -->
     <h1>Perfil de <%= user.nome %>
     </h1>
 
     <!-- <% if (user.isTwoFactorEnabled) { %>
-        <!-- Exibe o QR Code se o 2FA estiver ativado -->
-        <img src="<%= user.qrCodeUrl %>" alt="Código QR">
-        <p>O 2FA está ativado.</p>
-        <form action="/desativar-2fa" method="POST">
-            <button type="submit">Desativar 2FA</button>
+        Exibe o QR Code se o 2FA estiver ativado
+    <img src="<%= user.qrCodeUrl %>" alt="Código QR">
+    <p>O 2FA está ativado.</p>
+    <form action="/desativar-2fa" method="POST">
+        <button type="submit">Desativar 2FA</button>
+    </form>
+    <% } else { %>
+        Opção para ativar o 2FA
+        <p>O 2FA está desativado.</p>
+        <form action="/ativar-2fa" method="POST">
+            <button type="submit">Ativar 2FA</button>
         </form>
-        <% } else { %>
-            <!-- Opção para ativar o 2FA -->
-            <p>O 2FA está desativado.</p>
-            <form action="/ativar-2fa" method="POST">
-                <button type="submit">Ativar 2FA</button>
-            </form>
-            <% } %> -->
+        <% } %> -->
 
-                <script src="/js/script.js"></script>
+            <script src="/js/script.js"></script>
 </body>
 
 <footer>

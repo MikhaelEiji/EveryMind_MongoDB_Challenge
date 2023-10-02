@@ -35,7 +35,7 @@
                         <li><a href="#">Meu Perfil</a></li>
                         <li><a href="#">Processos</a></li>
                         <li><a href="/todas-vagas-disponiveis">Vagas</a></li>
-                        <li><a href="/">Sair</a></li>
+                        <li><a href="/logout">Sair</a></li>
                     </ul>
                 </nav>
             </div>
@@ -49,6 +49,17 @@
         </div>
 
     </section>
+
+    <div vw class="enabled">
+        <div vw-access-button class="active"></div>
+        <div vw-plugin-wrapper>
+            <div class="vw-plugin-top-wrapper"></div>
+        </div>
+    </div>
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script>
+        new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
 
     <form action="/pesquisar-candidatura" method="get">
         <div class="tituloSearch texto">
@@ -66,37 +77,49 @@
     <h2 class="qntVagas texto">Candidaturas: (<span id="quantidadeVagas">
             <%= resultados.length %>
         </span>)</h2>
-        <table style="width:80%; margin: auto;" class="bordered striped centered responsive-table">
-            <thead>
+    <table style="width:80%; margin: auto;" class="bordered striped centered responsive-table">
+        <thead>
+            <tr>
+                <th>Vaga</th>
+                <th>Título</th>
+                <th>Nome</th>
+                <th>Email</th>
+                <th>Celular</th>
+                <th>Visualizar</th>
+                <th>Download</th>
+                <th>Ação</th>
+                <th>Tech</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% resultados.forEach(function(resultado) { %>
                 <tr>
-                    <th>Vaga</th>
-                    <th>Título</th>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Celular</th>
-                    <th>Visualizar</th>
-                    <th>Download</th>
-                    <th>Ação</th>
-                    <th>Tech</th>
+                    <td>
+                        <%= resultado.vaga %>
+                    </td>
+                    <td>
+                        <%= resultado.titulo %>
+                    </td>
+                    <td>
+                        <%= resultado.nome %>
+                    </td>
+                    <td>
+                        <%= resultado.email %>
+                    </td>
+                    <td>
+                        <%= resultado.cel %>
+                    </td>
+                    <td><a href="/visualizar-curriculo/<%= resultado.pdf._id %>">Visualizar Currículo</a></td>
+                    <td><a href="/download-curriculo/<%= resultado.pdf._id %>">Fazer Download do Currículo</a></td>
+                    <td><button><a href="/candidaturas/<%= resultado._id %>">Ver Candidatura</a></button></td>
+                    <td>
+                        <%= resultado.tech %>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                <% resultados.forEach(function(resultado) { %>
-                    <tr>
-                        <td><%= resultado.vaga %></td>
-                        <td><%= resultado.titulo %></td>
-                        <td><%= resultado.nome %></td>
-                        <td><%= resultado.email %></td>
-                        <td><%= resultado.cel %></td>
-                        <td><a href="/visualizar-curriculo/<%= resultado.pdf._id %>">Visualizar Currículo</a></td>
-                        <td><a href="/download-curriculo/<%= resultado.pdf._id %>">Fazer Download do Currículo</a></td>
-                        <td><button><a href="/candidaturas/<%= resultado._id %>">Ver Candidatura</a></button></td>
-                        <td><%= resultado.tech %></td>
-                    </tr>
                 <% }); %>
-            </tbody>
-        </table>
-        
+        </tbody>
+    </table>
+
     <script src="../js/script.js"></script>
 </body>
 
