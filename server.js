@@ -51,10 +51,10 @@ app.use(helmet({
             imgSrc: ["'self'", 'data:', 'https:'],
             fontSrc: ["'self'", 'data:', 'https:'],
             styleSrc: ["'self'", "'unsafe-inline'", 'https:'],
-            scriptSrc: ["'self'", "'unsafe-inline'", 'https://vlibras.gov.br'],
+            scriptSrc: ["'self'", "'unsafe-inline'", 'https://vlibras.gov.br', 'https://cdn.jsdelivr.net'],
             scriptSrcAttr: ["'unsafe-inline'"],
             frameSrc: ["'self'", 'data:', 'blob:'],
-            connectSrc: ["'self'", 'https://vlibras.gov.br'],
+            connectSrc: ["'self'", 'https://vlibras.gov.br', 'https://cdn.jsdelivr.net'],
             upgradeInsecureRequests: isProduction ? [] : null,
         },
     },
@@ -143,6 +143,8 @@ app.get('/health', (req, res) => {
     if (mongoose.connection.readyState !== 1) return res.status(503).send('database unavailable');
     return res.status(200).send('ok');
 });
+
+app.get('/favicon.ico', (req, res) => res.status(204).end());
 
 // Configure o middleware de sessão
 const sessionStore = MongoStore.create({
@@ -253,6 +255,12 @@ passport.deserializeUser(async (id, done) => {
 function hasSpecialCharacter(senha) {
     const specialCharacters = ['@', '$', '!', '%', '*', '?', '&'];
     return specialCharacters.some(char => senha.includes(char));
+}
+
+function isValidName(nome) {
+    return typeof nome === 'string'
+        && nome.length <= 100
+        && /^\p{L}+(?:[ '\-]\p{L}+)*$/u.test(nome.trim());
 }
 
 app.get(ROUTE_HOME, (req, res) => {
@@ -523,11 +531,9 @@ app.post(ROUTE_INSERIR_USUARIO, async (req, res) => {
             return res.render('inserir-usuario', { mensagem: 'Um usuário com este e-mail já existe.' });
         }
         // Verifique se o "nome" contém apenas letras (sem números)
-        const nomeRegex = /^[A-Za-z]+$/;
-
-        if (!nomeRegex.test(nome)) {
+        if (!isValidName(nome)) {
             // Se o nome não atender aos requisitos, mostre o pop-up com a mensagem
-            return res.render('inserir-usuario', { mensagem: 'O "nome" deve conter apenas letras (sem números ou caracteres especiais).' });
+            return res.render('inserir-usuario', { mensagem: 'O nome deve conter apenas letras, espaços, hífens ou apóstrofos.' });
         }
 
         // Defina a expressão regular para verificar os requisitos
@@ -605,10 +611,8 @@ app.post(ROUTE_INSERIR_TECHRECRUITER, checkAccess('everyMind'), async (req, res)
         }
 
         // Verifique se o "nome" contém apenas letras (sem números)
-        const nomeRegex = /^[A-Za-z]+$/;
-
-        if (!nomeRegex.test(nome)) {
-            return res.render('inserir-techrecruiter', { mensagem: 'O "nome" deve conter apenas letras (sem números ou caracteres especiais).'});
+        if (!isValidName(nome)) {
+            return res.render('inserir-techrecruiter', { mensagem: 'O nome deve conter apenas letras, espaços, hífens ou apóstrofos.' });
         }
 
         // Defina a expressão regular para verificar os requisitos
@@ -661,10 +665,8 @@ app.post(ROUTE_INSERIR_EVERYMIND, checkAccess('everyMind'), async (req, res) => 
         }
 
         // Verifique se o "nome" contém apenas letras (sem números)
-        const nomeRegex = /^[A-Za-z]+$/;
-
-        if (!nomeRegex.test(nome)) {
-            return res.render('inserir-EveryMind', { mensagem: 'O "nome" deve conter apenas letras (sem números ou caracteres especiais).'});
+        if (!isValidName(nome)) {
+            return res.render('inserir-EveryMind', { mensagem: 'O nome deve conter apenas letras, espaços, hífens ou apóstrofos.' });
         }
 
         // Defina a expressão regular para verificar os requisitos

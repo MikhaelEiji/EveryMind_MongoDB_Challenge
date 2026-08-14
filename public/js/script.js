@@ -1,7 +1,7 @@
 function menuOnClick() {
-  document.getElementById("menu-bar").classList.toggle("change");
-  document.getElementById("nav").classList.toggle("change");
-  document.getElementById("menu-bg").classList.toggle("change-bg");
+  document.getElementById("menu-bar")?.classList.toggle("change");
+  document.getElementById("nav")?.classList.toggle("change");
+  document.getElementById("menu-bg")?.classList.toggle("change-bg");
 }
 
 const altoContraste = document.querySelector('#alto-contraste')
@@ -9,7 +9,7 @@ let darkMode = false
 const fonteElement = document.getElementById("fonte");
 let fontSize = 20; // Valor inicial da fonte em pixels (por exemplo, 20px)
 
-altoContraste.addEventListener("click", () => {
+altoContraste?.addEventListener("click", () => {
   if (darkMode === true) {
     darkMode = false
   } else {
@@ -31,18 +31,18 @@ function alteraCorDeFundo(darkMode) {
       elemento.style.color = "#fff"
     })
     // texto.style.color = "#fff"
-    texto2.style.color = "#fff"
+    if (texto2) texto2.style.color = "#fff"
   } else {
     body.style.backgroundColor = "#f1f1f1"
     texto.forEach(function (elemento) {
       elemento.style.color = "#333"
     })
     // texto.style.color = "#333"
-    texto2.style.color = "#333"
+    if (texto2) texto2.style.color = "#333"
   }
 }
 
-fonteElement.addEventListener("click", (event) => {
+fonteElement?.addEventListener("click", (event) => {
   const clickedElement = event.target;
 
   if (clickedElement.classList.contains("a-minus")) {
@@ -58,6 +58,7 @@ fonteElement.addEventListener("click", (event) => {
 document.addEventListener("DOMContentLoaded", function () {
   const pcdSelect = document.getElementById("pcd");
   const vulnerabilidadeInput = document.getElementById("vulnerabilidade");
+  if (!pcdSelect || !vulnerabilidadeInput) return;
 
   pcdSelect.addEventListener("change", function () {
     if (pcdSelect.value === "Sim") {
@@ -75,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const uppercaseRequirement = document.getElementById('uppercase');
   const numberRequirement = document.getElementById('number');
   const specialRequirement = document.getElementById('special');
+  if (!senhaInput || !senhaRequirements || !lengthRequirement || !uppercaseRequirement || !numberRequirement || !specialRequirement) return;
 
   senhaInput.addEventListener('input', function () {
     const senha = senhaInput.value;
@@ -114,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
   const senhaInput = document.getElementById('senha');
   const senhaRequirements = document.getElementById('senha-requirements');
+  if (!senhaInput || !senhaRequirements) return;
 
   senhaInput.addEventListener('input', function () {
     // Verifique se o campo de senha não está vazio
@@ -128,6 +131,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
   const nomeInput = document.getElementById('nome');
   const nomeWarning = document.getElementById('nome-warning');
+  if (!nomeInput || !nomeWarning) return;
 
   nomeInput.addEventListener('input', function () {
     const nome = nomeInput.value;
@@ -146,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
   const emailInput = document.getElementById('email');
   const emailWarning = document.getElementById('email-warning');
+  if (!emailInput || !emailWarning) return;
 
   emailInput.addEventListener('input', function () {
     const email = emailInput.value;
@@ -166,17 +171,19 @@ const mensagemErro = document.getElementById('mensagem-erro');
 
 // Função para mostrar a mensagem de erro
 function mostrarErro() {
-  mensagemErro.style.display = 'block';
+  if (mensagemErro) mensagemErro.style.display = 'block';
 }
 
 // Função para ocultar a mensagem de erro
 function ocultarErro() {
-  mensagemErro.style.display = 'none';
+  if (mensagemErro) mensagemErro.style.display = 'none';
 }
 
 // Adicione esta função para verificar se o e-mail já existe
 function verificarEmail() {
-  const email = document.getElementById('email').value; // Substitua 'email' pelo ID do campo de e-mail
+  const emailInput = document.getElementById('email');
+  if (!emailInput) return;
+  const email = emailInput.value; // Substitua 'email' pelo ID do campo de e-mail
 
   // Verifique se o campo de e-mail já está preenchido
   if (email) {
