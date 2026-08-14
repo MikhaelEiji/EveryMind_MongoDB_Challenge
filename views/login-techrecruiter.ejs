@@ -38,7 +38,8 @@
     </script>
 
     <div class="inputs-login">
-      <form id="loginForm" action="/login-techrecruiter" method="POST">
+        <form id="loginForm" action="/login-techrecruiter" method="POST">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <!-- Defina o método POST e a ação para /login -->
         <input type="text" id="email" name="email" placeholder="Email" class="input-form">
         <!-- Adicione um campo de email -->

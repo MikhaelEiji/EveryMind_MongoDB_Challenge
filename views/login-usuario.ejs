@@ -38,7 +38,8 @@
     </script>
 
     <div class="inputs-login">
-      <form id="loginForm" action="/login-usuario" method="POST"> <!-- Defina o método POST e a ação para /login -->
+        <form id="loginForm" action="/login-usuario" method="POST"> <!-- Defina o método POST e a ação para /login -->
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="text" id="email" name="email" placeholder="Email" class="input-form">
         <!-- Adicione um campo de email -->
         <input type="password" id="senha" name="senha" placeholder="Senha" class="input-form">

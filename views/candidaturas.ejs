@@ -34,7 +34,7 @@
                         <li><a href="#">Meu Perfil</a></li>
                         <li><a href="#">Processos</a></li>
                         <li><a href="/todas-vagas">Vagas</a></li>
-                        <li><a href="/logout">Sair</a></li>
+                        <li><form action="/logout" method="post" class="logout-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit">Sair</button></form></li>
                     </ul>
                 </nav>
             </div>
@@ -91,14 +91,14 @@
         <p>
         <div class="btnSearch">
             <button class="botaoSearch">
-                <a href="/visualizar-curriculo/<%= candidatura.pdf.filename %>">Visualizar Currículo</a>
+                        <a href="/visualizar-curriculo/<%= encodeURIComponent(candidatura.pdf.filename) %>">Visualizar Currículo</a>
             </button>
         </div>
         </p>
         <p>
         <div class="btnSearch">
             <button class="botaoSearch">
-                <a href="/download-curriculo/<%= candidatura.pdf.filename %>">Fazer Download do Currículo</a>
+                        <a href="/download-curriculo/<%= encodeURIComponent(candidatura.pdf.filename) %>">Fazer Download do Currículo</a>
             </button>
         </div>
         </p>
