@@ -34,7 +34,7 @@
                         <li><a href="#">Meu Perfil</a></li>
                         <li><a href="/vagas-aplicadas-usuario">Processos</a></li>
                         <li><a href="/todas-vagas">Vagas</a></li>
-                        <li><a href="/logout">Sair</a></li>
+                        <li><form action="/logout" method="post" class="logout-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit">Sair</button></form></li>
                     </ul>
                 </nav>
             </div>
@@ -76,7 +76,8 @@
     <h1 class="qntVagas texto">Vaga: (<span id="quantidadeVagas">
             <%= vaga.titulo %>
         </span>)</h1>
-    <form action="/aplicar-vaga/<%= vaga._id %>" method="post" enctype="multipart/form-data" class="form-aplicar">
+        <form action="/aplicar-vaga/<%= vaga._id %>" method="post" enctype="multipart/form-data" class="form-aplicar">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <label class="texto" for="cel">Celular:</label>
         <input type="tel" id="cel" name="cel" required class="input-celular">
         <br>

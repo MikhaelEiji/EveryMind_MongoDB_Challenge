@@ -1,13 +1,16 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-const bodyParser = require('body-parser');
 const multer = require('multer');
-const fs = require("fs");
+const path = require('path');
+const crypto = require('crypto');
+const helmet = require('helmet');
+const { rateLimit } = require('express-rate-limit');
+const MongoStore = require('connect-mongo').default;
+const { csrfSync } = require('csrf-sync');
 const Vaga = require('./models/Vaga');
 const User = require('./models/User'); // Importe o modelo de usuário
 const AplicadoVaga = require('./models/Aplicado-Vaga');
-const PDFModel = require('./models/PDFModel');
 const Perguntas = require('./models/Perguntas');
 const PerguntasUser = require('./models/Perguntas-User');
 const passport = require('passport'); // Requer o Passport.js
@@ -15,24 +18,49 @@ const LocalStrategy = require('passport-local').Strategy; // Requer a estratégi
 const session = require('express-session'); // Requer express-session
 const flash = require('express-flash');
 
-const app = express()
-app.use(flash());
-
-//
-mongoose.connect('mongodb://localhost/EveryMind', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-});
-
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
-
+const app = express();
+const isProduction = process.env.NODE_ENV === 'production';
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
-});
+// Usa o Atlas quando MONGODB_URI estiver configurado e preserva o banco local
+// para desenvolvimento sem um arquivo .env.
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost/EveryMind';
+const sessionSecret = process.env.SESSION_SECRET || 'chave-apenas-para-desenvolvimento-local';
+
+if (isProduction && !process.env.MONGODB_URI) {
+    throw new Error('MONGODB_URI deve ser configurada em producao.');
+}
+
+if (isProduction && !process.env.SESSION_SECRET) {
+    throw new Error('SESSION_SECRET deve ser configurado em producao.');
+}
+
+app.set('view engine', 'ejs');
+app.disable('x-powered-by');
+if (isProduction) app.set('trust proxy', 1);
+app.use(helmet({
+    crossOriginEmbedderPolicy: false,
+    strictTransportSecurity: isProduction ? undefined : false,
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            baseUri: ["'self'"],
+            formAction: ["'self'"],
+            frameAncestors: ["'self'"],
+            objectSrc: ["'none'"],
+            imgSrc: ["'self'", 'data:', 'https:'],
+            fontSrc: ["'self'", 'data:', 'https:'],
+            styleSrc: ["'self'", "'unsafe-inline'", 'https:'],
+            scriptSrc: ["'self'", "'unsafe-inline'", 'https://vlibras.gov.br', 'https://cdn.jsdelivr.net'],
+            scriptSrcAttr: ["'unsafe-inline'"],
+            frameSrc: ["'self'", 'data:', 'blob:'],
+            connectSrc: ["'self'", 'https://vlibras.gov.br', 'https://cdn.jsdelivr.net'],
+            upgradeInsecureRequests: isProduction ? [] : null,
+        },
+    },
+}));
+app.use(express.static('public'));
+app.use(express.urlencoded({ extended: false, limit: '100kb', parameterLimit: 50 }));
 
 function checkAccess(tipo) {
     return (req, res, next) => {
@@ -44,6 +72,35 @@ function checkAccess(tipo) {
             return res.redirect(ROUTE_LOGIN);
         }
     };
+}
+
+function checkAccessAny(...tipos) {
+    return (req, res, next) => {
+        if (req.isAuthenticated() && tipos.includes(req.user.tipo)) return next();
+        return res.redirect(ROUTE_LOGIN);
+    };
+}
+
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) return next();
+    return res.redirect(ROUTE_LOGIN);
+}
+
+function canAccessCandidatura(req, candidatura) {
+    if (req.user.tipo === 'everyMind') return true;
+    if (req.user.tipo === 'tech') return candidatura.tech === req.user.nome;
+    if (req.user.tipo === 'usuario') return candidatura.email === req.user.email;
+    return false;
+}
+
+function canManageVaga(req, vaga) {
+    return req.user.tipo === 'tech' && vaga.tech === req.user.nome;
+}
+
+function escapeRegex(value) {
+    return String(value || '')
+        .slice(0, 100)
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 // Defina constantes para suas rotas
@@ -82,18 +139,70 @@ const ROUTE_INSERIR_FAQ = '/inserir-faq';
 const ROUTE_INSERIR_PERGUNTA = '/inserir-pergunta'
 const ROUTE_TODAS_PERGUNTAS = '/todas-perguntas';
 
+app.get('/health', (req, res) => {
+    if (mongoose.connection.readyState !== 1) return res.status(503).send('database unavailable');
+    return res.status(200).send('ok');
+});
+
+app.get('/favicon.ico', (req, res) => res.status(204).end());
+
 // Configure o middleware de sessão
+const sessionStore = MongoStore.create({
+    mongoUrl: mongoUri,
+    collectionName: 'sessions',
+    ttl: 8 * 60 * 60,
+    touchAfter: 60 * 60,
+});
+
+sessionStore.on('error', (error) => {
+    console.error('Erro no armazenamento de sessoes:', error.message);
+});
+
 app.use(
     session({
-        secret: 'SecretKey', // Altere isso para uma chave secreta
+        name: 'everymind.sid',
+        secret: sessionSecret,
         resave: false,
         saveUninitialized: false,
+        store: sessionStore,
+        cookie: {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: 'lax',
+            maxAge: 8 * 60 * 60 * 1000,
+        },
     })
 );
+
+app.use(flash());
 
 // Inicialize o Passport e o middleware de sessão
 app.use(passport.initialize());
 app.use(passport.session());
+
+const { csrfSynchronisedProtection, generateToken } = csrfSync({
+    getTokenFromRequest: (req) => req.body?._csrf || req.headers['x-csrf-token'],
+});
+
+app.use((req, res, next) => {
+    // O Multer precisa ler o multipart antes de o token CSRF ficar disponivel.
+    if (req.is('multipart/form-data')) return next();
+    return csrfSynchronisedProtection(req, res, next);
+});
+
+app.use((req, res, next) => {
+    res.locals.csrfToken = generateToken(req);
+    next();
+});
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+    message: 'Muitas tentativas de login. Tente novamente em 15 minutos.',
+});
 
 // Configure o Passport para usar a estratégia Local com o modelo User
 passport.use(
@@ -146,6 +255,12 @@ passport.deserializeUser(async (id, done) => {
 function hasSpecialCharacter(senha) {
     const specialCharacters = ['@', '$', '!', '%', '*', '?', '&'];
     return specialCharacters.some(char => senha.includes(char));
+}
+
+function isValidName(nome) {
+    return typeof nome === 'string'
+        && nome.length <= 100
+        && /^\p{L}+(?:[ '\-]\p{L}+)*$/u.test(nome.trim());
 }
 
 app.get(ROUTE_HOME, (req, res) => {
@@ -207,7 +322,7 @@ app.get(ROUTE_INSERIR_VAGA, checkAccess('tech'), (req, res) => {
 
 app.post(ROUTE_INSERIR_VAGA, checkAccess('tech'), async (req, res) => {
     const { titulo, empresa, cargo_de_atuacao, salario, local, descricao } = req.body;
-    techt = req.user.nome
+    const techt = req.user.nome;
 
     const novaVaga = new Vaga({
         titulo,
@@ -232,6 +347,8 @@ app.post(ROUTE_INSERIR_VAGA, checkAccess('tech'), async (req, res) => {
 app.get(ROUTE_EXCLUIR_VAGA, checkAccess('tech'), async (req, res) => {
     try {
         const vaga = await Vaga.findById(req.params.id);
+        if (!vaga) return res.status(404).send('Vaga nao encontrada');
+        if (!canManageVaga(req, vaga)) return res.status(403).send('Acesso negado');
         res.render('excluir-vaga', { vaga });
     } catch (error) {
         console.error('Erro ao buscar vaga para exclusão:', error);
@@ -241,7 +358,10 @@ app.get(ROUTE_EXCLUIR_VAGA, checkAccess('tech'), async (req, res) => {
 
 app.post(ROUTE_EXCLUIR_VAGA, checkAccess('tech'), async (req, res) => {
     try {
-        await Vaga.findByIdAndDelete(req.params.id);
+        const vaga = await Vaga.findById(req.params.id);
+        if (!vaga) return res.status(404).send('Vaga nao encontrada');
+        if (!canManageVaga(req, vaga)) return res.status(403).send('Acesso negado');
+        await vaga.deleteOne();
 
         console.log('Vaga excluída do MongoDB');
         res.redirect(ROUTE_TODAS_VAGAS_DISPONIVEIS);
@@ -254,6 +374,8 @@ app.post(ROUTE_EXCLUIR_VAGA, checkAccess('tech'), async (req, res) => {
 app.get(ROUTE_EDITAR_VAGA, checkAccess('tech'), async (req, res) => {
     try {
         const vaga = await Vaga.findById(req.params.id);
+        if (!vaga) return res.status(404).send('Vaga nao encontrada');
+        if (!canManageVaga(req, vaga)) return res.status(403).send('Acesso negado');
         res.render('editar-vaga', { vaga });
     } catch (error) {
         console.error('Erro ao buscar vaga para edição:', error);
@@ -265,6 +387,9 @@ app.post(ROUTE_EDITAR_VAGA, checkAccess('tech'), async (req, res) => {
     const { titulo, empresa, salario, local, descricao } = req.body;
 
     try {
+        const vagaAtual = await Vaga.findById(req.params.id);
+        if (!vagaAtual) return res.status(404).send('Vaga nao encontrada');
+        if (!canManageVaga(req, vagaAtual)) return res.status(403).send('Acesso negado');
         await Vaga.findByIdAndUpdate(req.params.id, {
             titulo,
             empresa,
@@ -284,6 +409,8 @@ app.post(ROUTE_EDITAR_VAGA, checkAccess('tech'), async (req, res) => {
 app.get(ROUTE_EDITAR_STATUS_CANDIDATURA, checkAccess('tech'), async (req, res) => {
     try {
         const candidatura = await AplicadoVaga.findById(req.params.id);
+        if (!candidatura) return res.status(404).send('Candidatura nao encontrada');
+        if (!canAccessCandidatura(req, candidatura)) return res.status(403).send('Acesso negado');
         res.render('editar-candidaturas', { candidatura });
     } catch (error) {
         console.error('Erro ao buscar vaga para edição:', error);
@@ -292,19 +419,16 @@ app.get(ROUTE_EDITAR_STATUS_CANDIDATURA, checkAccess('tech'), async (req, res) =
 });
 
 app.post(ROUTE_EDITAR_STATUS_CANDIDATURA, checkAccess('tech'), async (req, res) => {
-    const { vaga, tech, titulo, nome, email, cel, status, pdf } = req.body;
+    const { status } = req.body;
+    const statusPermitidos = ['Aplicado', 'Reprovado', 'Selecionado', 'Testes', 'Entrevista', 'Aprovado', 'Finalizada'];
+    if (!statusPermitidos.includes(status)) return res.status(400).send('Status invalido');
 
     try {
-        await AplicadoVaga.findByIdAndUpdate(req.params.id, {
-            vaga,
-            tech,
-            titulo,
-            nome,
-            email,
-            cel,
-            status,
-            pdf,
-        });
+        const candidatura = await AplicadoVaga.findById(req.params.id);
+        if (!candidatura) return res.status(404).send('Candidatura nao encontrada');
+        if (!canAccessCandidatura(req, candidatura)) return res.status(403).send('Acesso negado');
+        candidatura.status = status;
+        await candidatura.save();
 
         console.log('Status editado no MongoDB');
         res.redirect(ROUTE_TODAS_CANDIDATURAS);
@@ -315,9 +439,9 @@ app.post(ROUTE_EDITAR_STATUS_CANDIDATURA, checkAccess('tech'), async (req, res) 
 });
 
 app.get(ROUTE_PESQUISAR, checkAccess('usuario'), async (req, res) => {
-    const queryCargo = req.query.q_cargo; // Obtenha o valor do campo "Cargo de atuação" da consulta
-    const queryLocal = req.query.q_local; // Obtenha o valor do campo "Local" da consulta
-    const queryCargo2 = req.query.q_cargo2;
+    const queryCargo = escapeRegex(req.query.q_cargo); // Obtenha o valor do campo "Cargo de atuação" da consulta
+    const queryLocal = escapeRegex(req.query.q_local); // Obtenha o valor do campo "Local" da consulta
+    const queryCargo2 = escapeRegex(req.query.q_cargo2);
 
 
     try {
@@ -368,14 +492,14 @@ app.get(ROUTE_LOGIN, (req, res) => {
     res.render('login');
 });
 
-app.post(ROUTE_LOGIN, passport.authenticate('local', {
+app.post(ROUTE_LOGIN, loginLimiter, passport.authenticate('local', {
     successRedirect: '/redirect', // Redirecionar para uma rota intermediária
     failureRedirect: '/login?erro=Usuário/Senha incorretos',
     failureFlash: true,
 }));
 
 // Rota intermediária para redirecionamento com base no tipo de usuário
-app.get('/redirect', (req, res) => {
+app.get('/redirect', checkAuthenticated, (req, res) => {
     // Verifique o tipo de usuário e redirecione com base nele
     const tipo = req.user.tipo;
     if (tipo === 'usuario') {
@@ -407,11 +531,9 @@ app.post(ROUTE_INSERIR_USUARIO, async (req, res) => {
             return res.render('inserir-usuario', { mensagem: 'Um usuário com este e-mail já existe.' });
         }
         // Verifique se o "nome" contém apenas letras (sem números)
-        const nomeRegex = /^[A-Za-z]+$/;
-
-        if (!nomeRegex.test(nome)) {
+        if (!isValidName(nome)) {
             // Se o nome não atender aos requisitos, mostre o pop-up com a mensagem
-            return res.render('inserir-usuario', { mensagem: 'O "nome" deve conter apenas letras (sem números ou caracteres especiais).' });
+            return res.render('inserir-usuario', { mensagem: 'O nome deve conter apenas letras, espaços, hífens ou apóstrofos.' });
         }
 
         // Defina a expressão regular para verificar os requisitos
@@ -489,10 +611,8 @@ app.post(ROUTE_INSERIR_TECHRECRUITER, checkAccess('everyMind'), async (req, res)
         }
 
         // Verifique se o "nome" contém apenas letras (sem números)
-        const nomeRegex = /^[A-Za-z]+$/;
-
-        if (!nomeRegex.test(nome)) {
-            return res.render('inserir-techrecruiter', { mensagem: 'O "nome" deve conter apenas letras (sem números ou caracteres especiais).'});
+        if (!isValidName(nome)) {
+            return res.render('inserir-techrecruiter', { mensagem: 'O nome deve conter apenas letras, espaços, hífens ou apóstrofos.' });
         }
 
         // Defina a expressão regular para verificar os requisitos
@@ -545,10 +665,8 @@ app.post(ROUTE_INSERIR_EVERYMIND, checkAccess('everyMind'), async (req, res) => 
         }
 
         // Verifique se o "nome" contém apenas letras (sem números)
-        const nomeRegex = /^[A-Za-z]+$/;
-
-        if (!nomeRegex.test(nome)) {
-            return res.render('inserir-EveryMind', { mensagem: 'O "nome" deve conter apenas letras (sem números ou caracteres especiais).'});
+        if (!isValidName(nome)) {
+            return res.render('inserir-EveryMind', { mensagem: 'O nome deve conter apenas letras, espaços, hífens ou apóstrofos.' });
         }
 
         // Defina a expressão regular para verificar os requisitos
@@ -596,8 +714,8 @@ app.get(ROUTE_TODOS_TECHRECRUITERS, checkAccess('everyMind'), async (req, res) =
 });
 
 app.get(ROUTE_PESQUISAR_TECH, checkAccess('tech'), async (req, res) => {
-    const queryCargo = req.query.q_cargo; // Obtenha o valor do campo "Cargo de atuação" da consulta
-    const queryLocal = req.query.q_local; // Obtenha o valor do campo "Local" da consulta
+    const queryCargo = escapeRegex(req.query.q_cargo); // Obtenha o valor do campo "Cargo de atuação" da consulta
+    const queryLocal = escapeRegex(req.query.q_local); // Obtenha o valor do campo "Local" da consulta
 
     try {
         let resultados;
@@ -658,56 +776,55 @@ app.get(ROUTE_APLICAR_VAGA, checkAccess('usuario'), async (req, res) => {
     }
 });
 
-// Configuração do armazenamento para o multer
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads'); // Diretório onde os PDFs serão temporariamente salvos
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+    fileFilter: (req, file, cb) => {
+        const isPdf = file.mimetype === 'application/pdf'
+            && path.extname(file.originalname).toLowerCase() === '.pdf';
+        if (!isPdf) return cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'pdfFile'));
+        return cb(null, true);
     },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname); // Use o nome original do arquivo
-    }
 });
 
-const upload = multer({ storage: storage });
 
-
-app.post(ROUTE_APLICAR_VAGA, checkAccess('usuario'), upload.single('pdfFile'), async (req, res) => {
+app.post(ROUTE_APLICAR_VAGA, checkAccess('usuario'), upload.single('pdfFile'), csrfSynchronisedProtection, async (req, res) => {
     try {
         // Recupere os dados do formulário
         const vagaId = req.params.id;
-        nome = req.user.nome;
-        email = req.user.email;
-        raca = req.user.raca;
-        genero = req.user.genero;
-        vulnerabilidade = req.user.vulnerabilidade;
+        const nome = req.user.nome;
+        const email = req.user.email;
+        const raca = req.user.raca;
+        const genero = req.user.genero;
+        const vulnerabilidade = req.user.vulnerabilidade;
         const { cel } = req.body;
 
         // Verifique se a vaga com o ID fornecido existe
         const vaga = await Vaga.findById(vagaId);
-        const techUser = vaga.tech;
-
         if (!vaga) {
             return res.status(404).send('Vaga não encontrada');
         }
+        const techUser = vaga.tech;
 
         // Verifique se o arquivo foi enviado corretamente
         if (!req.file) {
             return res.status(400).send('Nenhum arquivo enviado.');
         }
 
-        // Leia o arquivo PDF em um buffer
-        const pdfBuffer = fs.readFileSync(req.file.path);
+        const pdfBuffer = req.file.buffer;
+        if (pdfBuffer.subarray(0, 5).toString('ascii') !== '%PDF-') {
+            return res.status(400).send('O arquivo enviado nao e um PDF valido.');
+        }
 
         // Converta o buffer em uma string Base64
         const pdfBase64 = pdfBuffer.toString('base64');
 
-        // Salve a string Base64 no banco de dados MongoDB
-        const pdfDocument = new PDFModel({
-            filename: req.file.originalname,
-            content: pdfBase64,
-        });
-
-        await pdfDocument.save();
+        const safeOriginalName = path.basename(req.file.originalname)
+            .normalize('NFKD')
+            .replace(/[^\x00-\x7F]/g, '')
+            .replace(/[^A-Za-z0-9._-]/g, '_')
+            .slice(-100) || 'curriculo.pdf';
+        const storedFilename = `${crypto.randomUUID()}-${safeOriginalName}`;
 
         // Crie um objeto de candidatura com os detalhes
         const candidatura = new AplicadoVaga({
@@ -722,16 +839,13 @@ app.post(ROUTE_APLICAR_VAGA, checkAccess('usuario'), upload.single('pdfFile'), a
             genero,
             vulnerabilidade,
             pdf: {
-                filename: req.file.originalname,
+                filename: storedFilename,
                 content: pdfBase64,
             },
         });
 
         // Salve a candidatura em AplicadoVaga
         await candidatura.save();
-
-        // Exclua o arquivo temporário após a conversão e salvamento
-        fs.unlinkSync(req.file.path);
 
         let vagas;
         vagas = await Vaga.find(); // Se nenhuma área for especificada, busque todas as vagas
@@ -782,13 +896,13 @@ app.get(ROUTE_VAGAS_APLICADAS_USUARIO, checkAccess('usuario'), async (req, res) 
 });
 
 app.get(ROUTE_PESQUISAR_CANDIDATURA, checkAccess('tech'), async (req, res) => {
-    const queryNome = req.query.q_nome; // Obtenha o valor do campo "Nome" da consulta
-    const queryEmail = req.query.q_email; // Obtenha o valor do campo "Email" da consulta
+    const queryNome = escapeRegex(req.query.q_nome); // Obtenha o valor do campo "Nome" da consulta
+    const queryEmail = escapeRegex(req.query.q_email); // Obtenha o valor do campo "Email" da consulta
 
     try {
         let resultados;
         let query = "";
-        tech = req.user.nome // Certifique-se de definir a variável 'tech'
+        const tech = req.user.nome; // Certifique-se de definir a variável 'tech'
 
         if (queryNome && queryEmail) {
             // Se ambos os campos de pesquisa estão preenchidos, filtre com base em ambos
@@ -827,8 +941,8 @@ app.get(ROUTE_PESQUISAR_CANDIDATURA, checkAccess('tech'), async (req, res) => {
 });
 
 app.get(ROUTE_PESQUISAR_CANDIDATURA_ADMIN, checkAccess('everyMind'), async (req, res) => {
-    const queryNome = req.query.q_nome; // Obtenha o valor do campo "Nome" da consulta
-    const queryEmail = req.query.q_email; // Obtenha o valor do campo "Email" da consulta
+    const queryNome = escapeRegex(req.query.q_nome); // Obtenha o valor do campo "Nome" da consulta
+    const queryEmail = escapeRegex(req.query.q_email); // Obtenha o valor do campo "Email" da consulta
 
     try {
         let resultados;
@@ -858,7 +972,7 @@ app.get(ROUTE_PESQUISAR_CANDIDATURA_ADMIN, checkAccess('everyMind'), async (req,
             query = `Email: ${queryEmail}`;
         } else {
             // Se nenhum campo de pesquisa estiver preenchido, retorne todas as candidaturas do tech recruiter logado
-            resultados = await AplicadoVaga.find({ tech });
+            resultados = await AplicadoVaga.find({});
         }
         res.render('pesquisar-candidatura-admin', { resultados, query });
     } catch (error) {
@@ -867,12 +981,13 @@ app.get(ROUTE_PESQUISAR_CANDIDATURA_ADMIN, checkAccess('everyMind'), async (req,
     }
 });
 
-app.get(ROUTE_CANDIDATURAS, async (req, res) => {
+app.get(ROUTE_CANDIDATURAS, checkAccessAny('tech', 'everyMind'), async (req, res) => {
     try {
         const candidatura = await AplicadoVaga.findById(req.params.id);
         if (!candidatura) {
             return res.status(404).send('Candidatura não encontrada');
         }
+        if (!canAccessCandidatura(req, candidatura)) return res.status(403).send('Acesso negado');
 
         res.render('candidaturas', { candidatura });
     } catch (error) {
@@ -887,6 +1002,7 @@ app.get(ROUTE_CANDIDATURAS_USER, checkAccess('usuario'), async (req, res) => {
         if (!candidatura) {
             return res.status(404).send('Candidatura não encontrada');
         }
+        if (!canAccessCandidatura(req, candidatura)) return res.status(403).send('Acesso negado');
 
         res.render('candidaturas-user', { candidatura });
     } catch (error) {
@@ -895,7 +1011,7 @@ app.get(ROUTE_CANDIDATURAS_USER, checkAccess('usuario'), async (req, res) => {
     }
 });
 
-app.get(ROUTE_VISUALIZAR_CURRICULO, async (req, res) => {
+app.get(ROUTE_VISUALIZAR_CURRICULO, checkAuthenticated, async (req, res) => {
     try {
         const filename1 = req.params.filename;
 
@@ -905,6 +1021,7 @@ app.get(ROUTE_VISUALIZAR_CURRICULO, async (req, res) => {
         if (!documento) {
             return res.status(404).send('Documento não encontrado');
         }
+        if (!canAccessCandidatura(req, documento)) return res.status(403).send('Acesso negado');
 
         const { filename, content } = documento.pdf;
 
@@ -918,7 +1035,7 @@ app.get(ROUTE_VISUALIZAR_CURRICULO, async (req, res) => {
     }
 });
 
-app.get(ROUTE_DOWNLOAD_CURRICULO, async (req, res) => {
+app.get(ROUTE_DOWNLOAD_CURRICULO, checkAuthenticated, async (req, res) => {
     try {
         const filename1 = req.params.filename;
 
@@ -928,12 +1045,14 @@ app.get(ROUTE_DOWNLOAD_CURRICULO, async (req, res) => {
         if (!documento) {
             return res.status(404).send('Documento não encontrado');
         }
+        if (!canAccessCandidatura(req, documento)) return res.status(403).send('Acesso negado');
 
         const { filename, content } = documento.pdf;
 
         // Configurar os cabeçalhos de resposta para forçar o download
         res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+        const downloadName = path.basename(filename).replace(/[^A-Za-z0-9._-]/g, '_');
+        res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
 
         // Envie o PDF como resposta
         res.end(Buffer.from(content, 'base64'));
@@ -985,7 +1104,7 @@ app.get(ROUTE_INSERIR_PERGUNTA, checkAccess('usuario'), (req, res) => {
     res.render('inserir-pergunta');
 });
 
-app.post(ROUTE_INSERIR_PERGUNTA, async (req, res) => {
+app.post(ROUTE_INSERIR_PERGUNTA, checkAccess('usuario'), async (req, res) => {
     const { pergunta } = req.body;
 
     const novoPerguntaUser = new PerguntasUser({
@@ -1021,7 +1140,7 @@ app.post(ROUTE_TODAS_PERGUNTAS, checkAccess('tech'), async (req, res) => {
     res.render('todas-vagas', { user: req.user });
 });
 
-app.get(ROUTE_LOGOUT, (req, res) => {
+app.post(ROUTE_LOGOUT, checkAuthenticated, (req, res, next) => {
     req.logout(function (err) {
         if (err) {
             // Handle any errors that occur during logout
@@ -1031,3 +1150,34 @@ app.get(ROUTE_LOGOUT, (req, res) => {
         res.redirect(ROUTE_LOGIN);
     });
 });
+
+app.use((req, res) => {
+    res.status(404).send('Pagina nao encontrada');
+});
+
+app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).send('Sessao ou formulario expirado. Atualize a pagina e tente novamente.');
+    }
+    if (err instanceof multer.MulterError) {
+        return res.status(400).send('Envie somente um arquivo PDF de ate 5 MB.');
+    }
+    console.error('Erro nao tratado:', err);
+    return res.status(500).send('Erro interno do servidor');
+});
+
+async function startServer() {
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10_000 });
+    app.listen(port, () => {
+        console.log(`Servidor rodando em http://localhost:${port}`);
+    });
+}
+
+if (require.main === module) {
+    startServer().catch((error) => {
+        console.error('Falha ao iniciar o servidor:', error.message);
+        process.exit(1);
+    });
+}
+
+module.exports = app;

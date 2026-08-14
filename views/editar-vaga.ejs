@@ -34,7 +34,7 @@
                         <li><a href="#">Meu Perfil</a></li>
                         <li><a href="#">Processos</a></li>
                         <li><a href="/todas-vagas">Vagas</a></li>
-                        <li><a href="/logout">Sair</a></li>
+                        <li><form action="/logout" method="post" class="logout-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit">Sair</button></form></li>
                     </ul>
                 </nav>
             </div>
@@ -61,7 +61,8 @@
     </script>
 
     <h1 class="texto">Editar Vaga</h1>
-    <form action="/editar-vaga/<%= vaga._id %>" method="post">
+        <form action="/editar-vaga/<%= vaga._id %>" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <label for="titulo" class="texto">Título:</label>
         <input type="text" id="titulo" name="titulo" value="<%= vaga.titulo %>" required class="input-form1">
         <br>

@@ -105,6 +105,24 @@ header {
     font-weight: bold;
 }
 
+.nav li .logout-form {
+    display: inline;
+}
+
+.nav li .logout-form button {
+    background: transparent;
+    border: 0;
+    color: #333;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 20px;
+    padding: 0;
+}
+
+.nav li .logout-form button:hover {
+    font-weight: bold;
+}
+
 .menu-bg,
 #menu {
     top: 0;
